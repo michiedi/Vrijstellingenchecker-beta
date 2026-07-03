@@ -1,0 +1,2023 @@
+{
+  "meta": {
+    "title": "Vrijstellingenchecker Stad Gent",
+    "version": "0.1.0-prototype",
+    "legalBasis": [
+      "Vrijstellingsbesluit hoofdstuk 1 t.e.m. 13",
+      "ABR Gent 2024 - enkel gerichte extra checks"
+    ],
+    "disclaimer": "Interne ondersteunende checklist. De uitkomst blijft afhankelijk van correcte gegevens en juridisch nazicht."
+  },
+  "contextQuestions": [
+    {
+      "id": "address",
+      "label": "Adres of perceel",
+      "type": "text",
+      "placeholder": "Straat, huisnummer, Gent"
+    },
+    {
+      "id": "gis_rup_bpa",
+      "label": "Past de handeling binnen een geldende RUP, BPA of een verkaveling jonger dan 15 jaar?",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "ja",
+        "nee",
+        "niet van toepassing"
+      ]
+    },
+    {
+      "id": "gis_local_regulation_conflict",
+      "label": "Past de handeling binnen de gemeentelijke, provinciale en gewestelijke stedenbouwkundige verordeningen?",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "ja",
+        "nee"
+      ]
+    },
+    {
+      "id": "gis_permit_conditions",
+      "label": "Past de handeling binnen de bijzondere voorwaarden van vorige vergunningen?",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "ja",
+        "nee"
+      ]
+    },
+    {
+      "id": "housing_units_change",
+      "label": "Wijzigt het aantal woonentiteiten door de handeling?",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "ja",
+        "nee"
+      ]
+    },
+    {
+      "id": "gis_heritage",
+      "label": "Welke erfgoedcontext geldt hier?",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "geen",
+        "beschermd monument",
+        "inventaris bouwkundig erfgoed",
+        "UNESCO werelderfgoed of bufferzone"
+      ]
+    },
+    {
+      "id": "gis_water",
+      "label": "Ligt de handeling volledig of gedeeltelijk in de 5 meter-strook langs een bevaarbare of ingedeelde onbevaarbare waterloop, in de bedding ervan, in een erfdienstbaarheidszone langs een gracht van algemeen belang of in een afgebakende oeverzone? ",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "ja",
+        "nee",
+        "ja maar met akkoord beheerder"
+      ]
+    },
+    {
+      "id": "gis_vulnerable",
+      "label": "Ligt de handeling in ruimtelijk kwetsbaar gebied?",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "nee",
+        "parkgebied",
+        "ja"
+      ]
+    },
+    {
+      "id": "domain",
+      "label": "Waar gebeurt de handeling?",
+      "type": "select",
+      "options": [
+        "privaat domein",
+        "openbaar domein",
+        "wordt openbaar domein",
+        "onbekend"
+      ]
+    },
+    {
+      "id": "zone",
+      "label": "Planologische hoofdcontext",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "woongebied",
+        "agrarisch gebied",
+        "industriegebied",
+        "afgebakend zeehavengebied",
+        "recreatiegebied",
+        "parkgebied",
+        "gemeenschapsvoorzieningen",
+        "groen/open ruimte",
+        "ander"
+      ]
+    }
+  ],
+  "globalChecks": [
+    {
+      "id": "local_conflict",
+      "kind": "not",
+      "when": {
+        "gis_local_regulation_conflict": "nee"
+      },
+      "reason": "De vrijstelling geldt enkel wanneer de handeling past binnen de stedenbouwkundige verordeningen."
+    },
+    {
+      "id": "plan_conflict",
+      "kind": "not",
+      "when": {
+        "gis_rup_bpa": "nee"
+      },
+      "reason": "De handeling past niet binnen het geldende RUP, BPA of een verkaveling jonger dan 15 jaar."
+    },
+    {
+      "id": "permit_conditions",
+      "kind": "not",
+      "when": {
+        "gis_permit_conditions": "nee"
+      },
+      "reason": "De handeling past niet binnen uitdrukkelijke vergunningsvoorwaarden."
+    },
+    {
+      "id": "housing_units_change",
+      "kind": "not",
+      "when": {
+      "housing_units_change": "ja"
+    },
+    "reason": "Het aantal woonentiteiten wijzigt. De vrijstelling geldt alleen wanneer het aantal woonentiteiten gelijk blijft."
+    },
+    {
+      "id": "water",
+      "kind": "not",
+      "when": {
+        "gis_water": "ja"
+      },
+      "reason": "De vrijstelling geldt niet in de 5m beschermingsstrook van waterlopen/grachten/oeverzones, behalve met akkoord of bij afbraak."
+    },
+    {
+      "id": "unknowns",
+      "kind": "research",
+      "unknowns": [
+        "gis_rup_bpa",
+        "gis_local_regulation_conflict",
+        "gis_permit_conditions",
+        "housing_units_change",
+        "gis_heritage",
+        "gis_water",
+        "gis_vulnerable"
+      ],
+      "reason": "Een of meer contextgegevens zijn nog niet zeker."
+    }
+  ],
+  "abrChecks": {
+    "treeGent": {
+      "questions": [
+        {
+          "id": "abr_tree_circ_1m",
+          "label": "Wat is de stamomtrek op 1 meter hoogte?",
+          "type": "number",
+          "unit": "cm"
+        },
+        {
+          "id": "abr_tree_circ_base",
+          "label": "Wat is de stamomtrek aan het maaiveld?",
+          "type": "number",
+          "unit": "cm"
+        }
+      ],
+      "fail": "In Gent is een omgevingsvergunning nodig vanaf 50 cm stamomtrek op 1 meter hoogte of 75 cm aan het maaiveld, behalve binnen een goedgekeurd beheersplan."
+    },
+    "drivewayGent": {
+      "questions": [
+        {
+          "id": "abr_driveway_count",
+          "label": "Hoeveel opritten heeft het onroerend goed na de werken?",
+          "type": "number"
+        },
+        {
+          "id": "abr_driveway_road_width",
+          "label": "Wat is de nuttige rijwegbreedte?",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "abr_driveway_width",
+          "label": "Hoe breed is de oprit aan de rooilijn?",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "abr_driveway_slope",
+          "label": "Wat is de helling in de eerste 5 meter vanaf de rooilijn?",
+          "type": "number",
+          "unit": "%"
+        },
+        {
+          "id": "abr_driveway_autofree",
+          "label": "Gaat de oprit naar private parkeerplaatsen in autovrij gebied?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "fail": "De Gentse ABR-regels voor opritten beperken aantal, breedte, helling en opritten in autovrij gebied."
+    },
+    "greenRoofGent": {
+      "questions": [
+        {
+          "id": "abr_roof_flat",
+          "label": "Heeft het nieuwe dak een helling van maximaal 15 graden?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "abr_roof_area",
+          "label": "Hoe groot is het nieuwe dak?",
+          "type": "number",
+          "unit": "m²"
+        },
+        {
+          "id": "abr_roof_solution",
+          "label": "Wordt een groendak of gelijkwaardige toegelaten oplossing voorzien?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "fail": "Volgens het ABR is bij nieuwe platte of licht hellende daken groter dan 6 m² vaak een groendak of gelijkwaardige oplossing nodig."
+    },
+    "pavingGent": {
+      "questions": [
+        {
+          "id": "abr_paving_minimal",
+          "label": "Blijft de verharding beperkt tot wat nodig is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "abr_paving_infiltration",
+          "label": "Kan hemelwater infiltreren of op eigen terrein blijven?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "fail": "Het ABR vraagt om verharding te beperken en waar mogelijk waterdoorlatend of natuurlijk infiltrerend uit te voeren."
+    },
+    "ditchGent": {
+      "questions": [
+        {
+          "id": "abr_ditch_length",
+          "label": "Hoe lang is de overwelving of inbuizing?",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "abr_ditch_one",
+          "label": "Blijft het bij één overwelving of inbuizing per goed?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "abr_ditch_connections",
+          "label": "Worden afvalwater- of hemelwaterleidingen aangesloten op de inbuizing?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "fail": "Het ABR beperkt overwelvingen en staat geen aansluiting van afval- of hemelwaterleidingen op de inbuizing toe."
+    },
+    "horecaGent": {
+      "questions": [
+        {
+          "id": "abr_horeca_change",
+          "label": "Wijzigt de hoofd- of nevenfunctie naar horeca?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee",
+            "tijdelijk maximaal 4 periodes van 30 dagen"
+          ]
+        }
+      ],
+      "fail": "In Gent is een functiewijziging naar horeca vergunningsplichtig. Tijdelijke horeca kan enkel binnen de 4 x 30 dagen pop-up regeling en met lokale voorwaarden."
+    }
+  },
+  "themes": [
+    {
+      "id": "woning_gevel_dak",
+      "chapter": "H2",
+      "title": "Ik wil gevel- of dakwerken uitvoeren aan een woning",
+      "article": "Art. 2.1, 2° en 2.2",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "same_volume",
+          "label": "Blijft het fysieke bouwvolume gelijk?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "energy",
+          "label": "Verslechtert de energieprestatie na de werken?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "heritage_visible",
+          "label": "Gaat het om een zichtbaar gevel- of dakelement in inventaris/UNESCO-context?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor gevel- en dakwerken zonder volume-uitbreiding en zonder slechtere energieprestatie."
+    },
+    {
+      "id": "woning_isolatie",
+      "chapter": "H2",
+      "title": "Ik wil buitenisolatie plaatsen aan een woning",
+      "article": "Art. 2.1, 2/1° en 2.2",
+      "tags": [
+"isolatie",
+  "buitenisolatie",
+  "gevel",
+  "gevelisolatie",
+  "dak",
+  "dakisolatie",
+  "energie"
+],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "insulation_cm",
+          "label": "Hoe dik is de isolatie inclusief afwerking?",
+          "type": "number",
+          "unit": "cm"
+        },
+        {
+          "id": "cross_rooilijn",
+          "label": "Overschrijdt de isolatie de rooilijn?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "heritage_visible",
+          "label": "Gaat het om inventaris- of UNESCO-context?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk tot 26 cm, zonder rooilijnoverschrijding en met erfgoedfilter."
+    },
+    {
+      "id": "woning_zonnepanelen",
+      "chapter": "H2",
+      "title": "Ik wil zonnepanelen of een zonneboiler plaatsen bij een woning",
+      "article": "Art. 2.1, 3° en 2.2",
+      "tags": [
+        "zonnepanelen",
+        "zonneboiler",
+        "dak",
+        "gevel",
+        "erfgoed"
+      ],
+      "questions": [
+        {
+          "id": "mainlyPermitted",
+          "label": "Is de woning hoofdzakelijk vergund of vergund geacht?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "placementType",
+          "label": "Waar worden de zonnepanelen of zonneboiler geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "op een plat dak",
+            "in of op een hellend dakvlak",
+            "op een gevel",
+            "aan een balkonafsluiting",
+            "op een andere plaats"
+          ]
+        },
+        {
+          "id": "heightAboveRoofEdgeM",
+          "label": "Hoeveel meter komen ze boven de dakrand uit? Vul dit enkel in bij plaatsing op een plat dak.",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "facadeAreaM2",
+          "label": "Wat is de totale oppervlakte op deze gevel? Vul dit enkel in bij plaatsing op een gevel.",
+          "type": "number",
+          "unit": "m² per gevel"
+        },
+        {
+          "id": "worldHeritageZone",
+          "label": "Ligt de woning in werelderfgoed of in een bufferzone van werelderfgoed?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "inventoryHeritageNotProtected",
+          "label": "Is de woning opgenomen in de vastgestelde inventaris van bouwkundig erfgoed?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk wanneer de woning hoofdzakelijk vergund of vergund geacht is en de zonnepanelen of zonneboiler geplaatst worden op een toegelaten plaatsingswijze. Voor plaatsing op een plat dak geldt maximaal 1 meter boven de dakrand. Voor plaatsing op een gevel geldt maximaal 4 m² per gevel. In werelderfgoedcontext of bij een inventarispand geldt een bijkomende erfgoedfilter."
+    },
+    {
+      "id": "woning_binnen",
+      "chapter": "H2",
+      "title": "Ik wil binnen verbouwen in een woning",
+      "article": "Art. 2.1, 4° en 2.2",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wijzigt de vergunningsplichtige functie?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden gelijk?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk bij binnenverbouwingen zonder vergunningsplichtige functiewijziging en zonder wijziging van het aantal woongelegenheden."
+    },
+    {
+      "id": "woning_afsluiting",
+      "chapter": "H2",
+      "title": "Ik wil een afsluiting of poort plaatsen bij een woning",
+      "article": "Art. 2.1, 5°-7°",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "fence_location",
+          "label": "Waar komt de afsluiting?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "zijtuin",
+            "achtertuin",
+            "voortuin",
+            "toegangspoort",
+            "open afsluiting"
+          ]
+        },
+        {
+          "id": "fence_height",
+          "label": "Hoe hoog wordt de afsluiting of poort?",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "fence_closed_front",
+          "label": "Is het een gesloten afsluiting in de voortuin?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk tot 2 m in zij- en achtertuin, voor toegangspoorten/open afsluitingen tot 2 m, en gesloten voortuinafsluiting tot 1 m."
+    },
+    {
+      "id": "woning_niet_overdekt",
+      "chapter": "H2",
+      "title": "Ik wil een terras, zwembad of andere niet-overdekte constructie plaatsen bij een woning",
+      "article": "Art. 2.1, 8° en 2.2",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "garden_zone",
+          "label": "Ligt de constructie in zijtuin of achtertuin?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "area_total",
+          "label": "Wat is de gezamenlijke oppervlakte van alle niet-overdekte constructies?",
+          "type": "number",
+          "unit": "m²"
+        },
+        {
+          "id": "distance_boundary",
+          "label": "Minimale afstand tot perceelsgrens, tenzij tegen bestaande scheidingsmuur",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "rain_own",
+          "label": "Blijft hemelwater op eigen terrein?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [
+        "pavingGent"
+      ],
+      "passText": "Vrijstelling mogelijk voor niet-overdekte constructies in zij- of achtertuin tot samen 80 m²."
+    },
+{
+  "id": "woning_airco",
+  "chapter": "H2",
+  "title": "Ik wil een warmtepomp of airco plaatsen bij een woning",
+  "article": "Art. 2.1, 8°/1",
+  "tags": [
+    "warmtepomp",
+    "airco",
+    "buitendeel",
+    "tuin",
+    "gevel",
+    "plat dak"
+  ],
+  "questions": [
+    {
+      "id": "legal",
+      "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "ja",
+        "nee"
+      ]
+    },
+    {
+      "id": "airco_place",
+      "label": "Waar komt het buitendeel?",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "achtertuin",
+        "voortuin",
+        "gevel",
+        "plat dak",
+        "ander"
+      ]
+    },
+    {
+      "id": "airco_distance",
+      "label": "Wat is de afstand van het buitendeel tot de perceelsgrens?",
+      "type": "number",
+      "unit": "m"
+    },
+    {
+      "id": "airco_against_wall",
+      "label": "Wordt het buitendeel tegen een bestaande scheidingsmuur geplaatst?",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "ja",
+        "nee"
+      ]
+    }
+  ],
+  "abr": [],
+  "passText": "Vrijstelling mogelijk in de tuin, op een gevel of op een plat dak wanneer het buitendeel minstens 2 meter afstand houdt tot de perceelsgrens, of tegen een bestaande scheidingsmuur wordt geplaatst."
+},
+    {
+      "id": "woning_oprit",
+      "chapter": "H2",
+      "title": "Ik wil een oprit of toegang aanleggen bij een woning",
+      "article": "Art. 2.1, 9° en 12/1.3",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "strict_access",
+          "label": "Is dit de strikt noodzakelijke toegang of oprit naar het gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "rain_own",
+          "label": "Blijft hemelwater op eigen terrein?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "ditch_involved",
+          "label": "Wordt een baangracht overwelfd of ingebuisd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [
+        "drivewayGent",
+        "pavingGent",
+        "ditchGent"
+      ],
+      "passText": "Vrijstelling mogelijk voor de strikt noodzakelijke toegang/oprit met hemelwater op eigen terrein. Baangracht apart toetsen."
+    },
+    {
+      "id": "woning_bijgebouw",
+      "chapter": "H2",
+      "title": "Ik wil een vrijstaand bijgebouw of carport plaatsen bij een woning",
+      "article": "Art. 2.1, 11° en 2.2",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "not_stay",
+          "label": "Is het bijgebouw niet bestemd voor verblijf?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "side_or_back",
+          "label": "Komt het in zijtuin of achtertuin?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "zijtuin",
+            "achtertuin"
+          ]
+        },
+        {
+          "id": "area_total",
+          "label": "Totale oppervlakte inclusief bestaande vrijstaande bijgebouwen",
+          "type": "number",
+          "unit": "m²"
+        },
+        {
+          "id": "height",
+          "label": "Wat is de hoogte?",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "distance_boundary",
+          "label": "Afstand tot perceelsgrens of tegen bestaande scheidingsmuur",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "rain_own",
+          "label": "Blijft hemelwater op eigen terrein?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [
+        "greenRoofGent"
+      ],
+      "passText": "Vrijstelling mogelijk tot samen 40 m² en maximaal 3,5 m hoog, met afstandsregels en hemelwater op eigen terrein."
+    },
+    {
+      "id": "woning_opslag",
+      "chapter": "H2",
+      "title": "Ik wil materiaal opslaan bij een woning",
+      "article": "Art. 2.1, 12° en 2.2",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "volume",
+          "label": "Volume opslag",
+          "type": "number",
+          "unit": "m³"
+        },
+        {
+          "id": "visible_road",
+          "label": "Is de opslag zichtbaar vanaf de openbare weg?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk tot 10 m³ voor bij de woning horende materialen, uit het zicht van de openbare weg."
+    },
+    {
+      "id": "woning_verplaatsbaar",
+      "chapter": "H2",
+      "title": "Ik wil één verplaatsbare inrichting plaatsen bij een woning",
+      "article": "Art. 2.1, 13° en 2.2",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "one_unit",
+          "label": "Gaat het om maximaal één verplaatsbare inrichting?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "actual_living",
+          "label": "Wordt er effectief gewoond?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "visible_road",
+          "label": "Is de inrichting zichtbaar vanaf de openbare weg?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor één verplaatsbare inrichting zonder effectieve bewoning en niet zichtbaar vanaf de openbare weg."
+    },
+    {
+      "id": "woning_techniek",
+      "chapter": "H2",
+      "title": "Ik wil een technische constructie plaatsen op of aan een woning",
+      "article": "Art. 2.1, 14°",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "above_ridge",
+          "label": "Hoeveel meter steekt de constructie boven de nok uit?",
+          "type": "number",
+          "unit": "m"
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor gebruikelijke technische constructies tot 3 m boven de nok."
+    },
+    {
+      "id": "woning_laad_afval",
+      "chapter": "H2",
+      "title": "Ik wil een laadpaal of afvalhouder plaatsen bij een woning",
+      "article": "Art. 2.1, 15°-16°",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "object_type",
+          "label": "Wat plaats je?",
+          "type": "select",
+          "options": [
+            "laadpaal",
+            "glasbol/kledingcontainer/afvalhouder"
+          ]
+        },
+        {
+          "id": "area_total",
+          "label": "Gezamenlijke oppervlakte afvalhouders",
+          "type": "number",
+          "unit": "m²"
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor elektrische laadpalen en afvalhouders kleiner dan 10 m²."
+    },
+    {
+      "id": "andere_gebouwen",
+      "chapter": "H3",
+      "title": "Ik wil werken uitvoeren bij een ander gebouw dan een woning",
+      "article": "Art. 3.1-3.2",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "action_other_building",
+          "label": "Welke handeling?",
+          "type": "select",
+          "options": [
+            "gevel/dak",
+            "buitenisolatie",
+            "zonnepanelen/zonneboiler",
+            "binnenverbouwing",
+            "afsluiting/poort",
+            "oprit",
+            "seizoensgebonden horecaterras",
+            "technische constructie",
+            "afvalopslag",
+            "afvalhouder",
+            "laadpaal"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Ligt de handeling binnen 30 m wanneer artikel 3.2 dat vraagt?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wijzigt de vergunningsplichtige functie?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "heritage_visible",
+          "label": "Gaat het om inventaris- of UNESCO-context bij zichtbare gevel/dak/zon op gevel?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [
+        "drivewayGent",
+        "pavingGent",
+        "greenRoofGent",
+        "horecaGent"
+      ],
+      "passText": "Vrijstelling mogelijk voor de opgesomde handelingen bij hoofdzakelijk vergunde andere gebouwen, met 30 m-, functie- en erfgoedfilter."
+    },
+    {
+      "id": "industrie_constructie",
+      "chapter": "H4",
+      "title": "Ik wil een constructie, verharding of gebouw plaatsen in industriegebied",
+      "article": "Art. 4.1-4.4",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "industry_zone",
+          "label": "Ligt de projectzone in industriegebied in ruime zin?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "industry_action",
+          "label": "Wat plaats je?",
+          "type": "select",
+          "options": [
+            "constructie zonder gebouw/verharding",
+            "verharding",
+            "gebouw"
+          ]
+        },
+        {
+          "id": "seaport",
+          "label": "Ligt dit in afgebakend zeehavengebied?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "rup_bpa_required",
+          "label": "Bestaat er een RUP of BPA waar het artikel dat vereist?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "area_total",
+          "label": "Oppervlakte van de nieuwe vrijgestelde handeling",
+          "type": "number",
+          "unit": "m²"
+        },
+        {
+          "id": "height",
+          "label": "Hoogte",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "distance_existing",
+          "label": "Afstand tot vergund gebouw of vergunde verharding",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "distance_residential",
+          "label": "Afstand tot woongebied of kwetsbaar gebied",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "distance_boundary",
+          "label": "Afstand tot perceelsgrenzen",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "fire_access",
+          "label": "Blijft bereikbaarheid voor hulpdiensten behouden?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "deforestation",
+          "label": "Gaat de handeling gepaard met ontbossing?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "rain_own",
+          "label": "Blijft hemelwater op eigen terrein?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [
+        "pavingGent",
+        "greenRoofGent"
+      ],
+      "passText": "Vrijstelling mogelijk binnen de maxima voor industriegebied/zeehavengebied, met afstands-, hulpdienst-, voorschriften- en hemelwatervoorwaarden."
+    },
+    {
+      "id": "landbouw",
+      "chapter": "H5",
+      "title": "Ik wil een landbouw- of tuinbouwconstructie plaatsen",
+      "article": "Art. 5.1-5.3",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "agri_zone",
+          "label": "Ligt de handeling in agrarisch gebied in ruime zin wanneer vereist?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "agri_action",
+          "label": "Welke handeling?",
+          "type": "select",
+          "options": [
+            "teeltconstructie",
+            "open afsluiting",
+            "schuilhok",
+            "drainage",
+            "peilgestuurde drainage",
+            "perceelsoprit",
+            "sleufsilo",
+            "pocketvergister",
+            "vul- en spoelplaats",
+            "wateropslag",
+            "stuw/maatregel",
+            "andere landbouwconstructie"
+          ]
+        },
+        {
+          "id": "professional",
+          "label": "Dient de handeling voor professionele landbouw/veeteelt wanneer vereist?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "height",
+          "label": "Hoogte",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "area_total",
+          "label": "Oppervlakte",
+          "type": "number",
+          "unit": "m²"
+        },
+        {
+          "id": "volume",
+          "label": "Volume",
+          "type": "number",
+          "unit": "m³"
+        },
+        {
+          "id": "distance_existing",
+          "label": "Afstand tot landbouwbedrijfsgebouw/gebouwencomplex",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "archaeology",
+          "label": "Ligt de handeling in vastgestelde archeologische zone?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "erosion_flood",
+          "label": "Ligt de handeling in erosiegevoelig of middelgroot overstromingsgebied wanneer artikel 5 dat uitsluit?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [
+        "drivewayGent",
+        "ditchGent",
+        "pavingGent"
+      ],
+      "passText": "Vrijstelling mogelijk voor de opgesomde landbouw- en tuinbouwhandelingen met strikte zone-, maat-, afstands- en watervoorwaarden."
+    },
+    {
+      "id": "groen_boom",
+      "chapter": "H6",
+      "title": "Ik wil een boom vellen of groenhandeling uitvoeren",
+      "article": "Art. 6.1-6.3",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "green_action",
+          "label": "Welke handeling?",
+          "type": "select",
+          "options": [
+            "boom vellen",
+            "oprit/inbuizing in project",
+            "gracht aanleggen/openleggen/herprofileren/dempen",
+            "reliëfwijziging",
+            "poel",
+            "kleinschalige recreatieve infrastructuur",
+            "faunavoorziening",
+            "infiltratie/buffer",
+            "open afsluiting"
+          ]
+        },
+        {  
+          "id": "tree_circumference_1m",
+          "label": "Wat is de stamomtrek van de boom op 1 meter hoogte?",
+          "type": "number",
+          "unit": "cm"
+        },
+        {
+          "id": "tree_circumference_base",
+          "label": "Wat is de stamomtrek van de boom aan het maaiveld?",
+          "type": "number",
+          "unit": "cm"
+        },
+        {
+          "id": "forest",
+          "label": "Maakt de boom deel uit van een bos?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_15m",
+          "label": "Ligt de boom binnen 15 m van vergunde woning/landbouw/bedrijf?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "acute_danger",
+          "label": "Is er acuut gevaar met schriftelijke instemming burgemeester?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "approved_plan",
+          "label": "Past de handeling binnen een goedgekeurd beheer- of inrichtingsplan?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "area_total",
+          "label": "Oppervlakte poel/infiltratievoorziening",
+          "type": "number",
+          "unit": "m²"
+        }
+      ],
+      "abr": [
+        "treeGent",
+        "drivewayGent",
+        "ditchGent"
+      ],
+      "passText": "Vrijstelling mogelijk in de limitatieve gevallen van artikel 6.1-6.3. In Gent geldt een strengere boomcheck."
+    },
+    {
+      "id": "tijdelijk",
+      "chapter": "H7",
+      "title": "Ik wil een tijdelijke handeling uitvoeren",
+      "article": "Art. 7.1-7.5",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "temp_action",
+          "label": "Welke tijdelijke handeling?",
+          "type": "select",
+          "options": [
+            "werfconstructies",
+            "verplaatsbare constructie tijdens verbouwing",
+            "tijdelijke constructie/evenement",
+            "tijdelijke functiewijziging",
+            "tijdelijke reliëfwijziging sport",
+            "tijdelijk kamperen"
+          ]
+        },
+        {
+          "id": "previous_popup_same_good",
+          "label": "Was er dit kalenderjaar al een pop-up of tijdelijke functiewijziging op hetzelfde goed?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "previous_popup_periods_30",
+          "label": "Hoeveel periodes van 30 dagen zijn dit kalenderjaar al gebruikt op hetzelfde goed?",
+          "type": "number"
+        },
+        {
+          "id": "periods_30",
+          "label": "Hoeveel nieuwe periodes van 30 dagen worden nu gevraagd?",
+          "type": "number"
+        },
+        {
+          "id": "duration_years",
+          "label": "Duur in jaren indien verbouwing/herbouw",
+          "type": "number"
+        },
+        {
+          "id": "height",
+          "label": "Hoogte",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "rk_area_ok",
+          "label": "Ligt de handeling buiten ruimtelijk kwetsbaar gebied behalve parkgebied?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "deforestation",
+          "label": "Gaat de plaatsing samen met ontbossing, vegetatiewijziging, reliëfwijziging of wijziging waterlichamen?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [
+        "horecaGent"
+      ],
+      "passText": "Vrijstelling mogelijk binnen de tijdelijke maxima, zoals 4 periodes van 30 dagen of de werfduurregeling."
+    },
+    {
+      "id": "terreinen",
+      "chapter": "H8",
+      "title": "Ik wil een ingericht terrein herinrichten of verplaatsbare verblijven plaatsen",
+      "article": "Art. 8.1-8.6",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "terrain_type",
+          "label": "Type terrein",
+          "type": "select",
+          "options": [
+            "begraafplaats",
+            "park/groen",
+            "sportterrein",
+            "recreatieterrein",
+            "carpoolparking",
+            "militair domein",
+            "terreingerelateerd logies",
+            "woonwagenterrein",
+            "gesloten instelling"
+          ]
+        },
+        {
+          "id": "licensed_terrain",
+          "label": "Is het terrein hoofdzakelijk vergund?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "buffer_green",
+          "label": "Blijven buffer- en groenzones behouden?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wijzigt de functie?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "large_building",
+          "label": "Worden grote gebouwen of overdekte constructies toegevoegd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "advice_fire",
+          "label": "Is gunstig advies hulpverleningszone nodig en aanwezig?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee",
+            "niet van toepassing"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor herinrichting of tijdelijke/verplaatsbare verblijven binnen de terreinvoorwaarden van hoofdstuk 8."
+    },
+    {
+      "id": "publiciteit",
+      "chapter": "H9",
+      "title": "Ik wil publiciteit plaatsen",
+      "article": "Art. 9",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "ad_type",
+          "label": "Welke publiciteit?",
+          "type": "select",
+          "options": [
+            "zaakgebonden",
+            "straatmeubilair/nutsvoorziening",
+            "overheidscampagne",
+            "verkiezingspubliciteit",
+            "te koop/te huur",
+            "tijdelijke niet-commerciële activiteit"
+          ]
+        },
+        {
+          "id": "area_total",
+          "label": "Oppervlakte",
+          "type": "number",
+          "unit": "m²"
+        },
+        {
+          "id": "light",
+          "label": "Is de publiciteit lichtgevend?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "publicity_regulation",
+          "label": "Voldoet de publiciteit aan de Publiciteitsverordening?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor de opgesomde publiciteitsinrichtingen, meestal met oppervlakte- en duurtijdvoorwaarden en toets aan de Publiciteitsverordening."
+    },
+    {
+      "id": "openbaar_domein",
+      "chapter": "H10",
+      "title": "Ik wil werken uitvoeren op openbaar domein",
+      "article": "Art. 10",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "public_action",
+          "label": "Welke handeling?",
+          "type": "select",
+          "options": [
+            "nieuwe verharding",
+            "wijziging bestaande verharding",
+            "verkeersremmer/nutsvoorziening",
+            "overdekte fietsenstalling",
+            "niet-overdekt horecaterras",
+            "laadinfrastructuur",
+            "brug/tunnel vervangen",
+            "zonnepanelen berm/talud"
+          ]
+        },
+        {
+          "id": "area_total",
+          "label": "Bijkomende samenhangende oppervlakte",
+          "type": "number",
+          "unit": "m²"
+        },
+        {
+          "id": "height",
+          "label": "Hoogte",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "relief_cm",
+          "label": "Reliëfwijziging",
+          "type": "number",
+          "unit": "cm"
+        },
+        {
+          "id": "permeable_replaced",
+          "label": "Wordt waterdoorlatende verharding vervangen door niet-waterdoorlatende?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "infiltrate",
+          "label": "Infiltreert hemelwater ter plaatse wanneer vereist?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor beperkte handelingen op openbaar domein, zoals verharding tot 300 m² en fietsenstalling tot 100 m²/5 m."
+    },
+    {
+      "id": "algemeen_belang",
+      "chapter": "H11",
+      "title": "Ik wil een handeling van algemeen belang uitvoeren",
+      "article": "Art. 11.1-11.9",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "public_actor",
+          "label": "Gebeurt dit door, in opdracht van of voor een publieke actor/algemeen belang?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "public_interest_action",
+          "label": "Welke handeling?",
+          "type": "select",
+          "options": [
+            "kleinschalige technische infrastructuur",
+            "technische constructie",
+            "standbeeld/gedenkteken/kunstwerk",
+            "veldkapel",
+            "archeologisch vooronderzoek/opgraving",
+            "afsluiting",
+            "pyloon/mast/windturbine vervangen",
+            "toegang/oprit",
+            "kleinschalige afvalwaterzuivering",
+            "bodemsanering"
+          ]
+        },
+        {
+          "id": "height",
+          "label": "Hoogte",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "volume",
+          "label": "Volume",
+          "type": "number",
+          "unit": "m³"
+        },
+        {
+          "id": "area_total",
+          "label": "Oppervlakte",
+          "type": "number",
+          "unit": "m²"
+        },
+        {
+          "id": "same_or_smaller",
+          "label": "Is vervanging kennelijk gelijk of kleiner?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "private_heritage",
+          "label": "Privaat domein met erfgoedgevoelige context?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [
+        "drivewayGent",
+        "pavingGent"
+      ],
+      "passText": "Vrijstelling mogelijk voor de limitatieve handelingen van algemeen belang binnen hoogte-, volume-, erfgoed- en projectvoorwaarden."
+    },
+    {
+      "id": "telecom",
+      "chapter": "H12",
+      "title": "Ik wil telecommunicatie-infrastructuur plaatsen",
+      "article": "Art. 12.1-12.4",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "telecom_place",
+          "label": "Waar komt de installatie?",
+          "type": "select",
+          "options": [
+            "in bestaand gebouw/constructie",
+            "aan buitenzijde bestaand gebouw/constructie",
+            "op dak",
+            "op bestaande pyloon/mast",
+            "aan hoogspanningspyloon",
+            "schotelantenne",
+            "kabels/leidingen/glasvezel"
+          ]
+        },
+        {
+          "id": "above_building",
+          "label": "Steekt de installatie boven gebouw of constructie uit?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "height",
+          "label": "Hoogte boven dakrand/gebouw/pyloon",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "dish_diameter",
+          "label": "Diameter schotelantenne",
+          "type": "number",
+          "unit": "cm"
+        },
+        {
+          "id": "creates_building",
+          "label": "Wordt een gebouw opgericht?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor telecom in/aan/op bestaande infrastructuur, dakinstallaties, schotels, kabels en glasvezelnetwerken binnen de voorwaarden."
+    },
+    {
+      "id": "divers",
+      "chapter": "H12/1",
+      "title": "Ik wil reliëf wijzigen, infiltratie voorzien, een baangracht overwelven of een kijkhut/jachtkansel plaatsen",
+      "article": "Art. 12/1.1-12/1.5",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "diverse_action",
+          "label": "Welke handeling?",
+          "type": "select",
+          "options": [
+            "kleine reliëfwijziging",
+            "bovengrondse infiltratievoorziening",
+            "laadpaal op bestaande verharding",
+            "baangracht overwelven/inbuizen",
+            "jachtkansel",
+            "vogelkijkhut"
+          ]
+        },
+        {
+          "id": "relief_cm",
+          "label": "Hoogte/diepte reliëfwijziging",
+          "type": "number",
+          "unit": "cm"
+        },
+        {
+          "id": "volume",
+          "label": "Volume grondverzet",
+          "type": "number",
+          "unit": "m³"
+        },
+        {
+          "id": "depth_cm",
+          "label": "Diepte infiltratievoorziening",
+          "type": "number",
+          "unit": "cm"
+        },
+        {
+          "id": "ditch_length",
+          "label": "Lengte overwelving/inbuizing baangracht",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "ditch_diameter",
+          "label": "Binnendiameter",
+          "type": "number",
+          "unit": "mm"
+        },
+        {
+          "id": "ditch_one",
+          "label": "Blijft het bij één overwelving/inbuizing per goed?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "ditch_or_water_damp",
+          "label": "Wordt een gracht of waterloop gedempt?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [
+        "ditchGent",
+        "pavingGent"
+      ],
+      "passText": "Vrijstelling mogelijk voor kleine reliëfwijzigingen, infiltratievoorzieningen, laadpalen op verharding, baangrachten, jachtkansels en vogelkijkhutten binnen de maxima."
+    },
+    {
+      "id": "afbraak",
+      "chapter": "H13",
+      "title": "Ik wil iets afbreken of verwijderen",
+      "article": "Art. 13.1-13.3",
+      "tags": [],
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "demo_action",
+          "label": "Wat breek je af?",
+          "type": "select",
+          "options": [
+            "constructie die onder vrijstellingsbesluit valt",
+            "vrijstaand bouwwerk/constructie",
+            "verharding",
+            "pyloon/mast"
+          ]
+        },
+        {
+          "id": "heritage_object",
+          "label": "Heeft het object erfgoedwaarde of is het inventariserfgoed?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "volume",
+          "label": "Bouwvolume",
+          "type": "number",
+          "unit": "m³"
+        },
+        {
+          "id": "full_demo",
+          "label": "Gaat het om volledige afbraak of volledige bovengrondse afbraak?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor afbraak van vrijgestelde constructies, bepaalde vrijstaande bouwwerken, verhardingen en pylonen/masten met erfgoed- en volumedrempels."
+    }
+  ]
+}
