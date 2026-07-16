@@ -1,12 +1,13 @@
 {
   "meta": {
     "title": "Vrijstellingenchecker Stad Gent",
-    "version": "0.1.0-prototype",
+    "version": "0.3.0-h1-h3-candidate",
     "legalBasis": [
       "Vrijstellingsbesluit hoofdstuk 1 t.e.m. 13",
       "ABR Gent 2024 - enkel gerichte extra checks"
     ],
-    "disclaimer": "Interne ondersteunende checklist. De uitkomst blijft afhankelijk van correcte gegevens en juridisch nazicht."
+    "disclaimer": "Interne ondersteunende checklist. De uitkomst blijft afhankelijk van correcte gegevens en juridisch nazicht.",
+    "changeNote": "Hoofdstukken 1, 2 en 3 herbouwd volgens het Vrijstellingsbesluit van 18 mei 2026. MER-bevraging blijft bewust buiten scope."
   },
   "contextQuestions": [
     {
@@ -17,7 +18,7 @@
     },
     {
       "id": "gis_rup_bpa",
-      "label": "Past de handeling binnen een geldende RUP, BPA of een verkaveling jonger dan 15 jaar?",
+      "label": "Past de handeling binnen het geldende RUP, BPA of een verkaveling jonger dan 15 jaar?",
       "type": "select",
       "options": [
         "onbekend",
@@ -38,67 +39,23 @@
     },
     {
       "id": "gis_permit_conditions",
-      "label": "Past de handeling binnen de bijzondere voorwaarden van vorige vergunningen?",
+      "label": "Past de handeling binnen de uitdrukkelijke voorwaarden van bestaande vergunningen?",
       "type": "select",
       "options": [
         "onbekend",
         "ja",
         "nee"
-      ]
-    },
-    {
-      "id": "housing_units_change",
-      "label": "Wijzigt het aantal woonentiteiten door de handeling?",
-      "type": "select",
-      "options": [
-        "onbekend",
-        "ja",
-        "nee"
-      ]
-    },
-    {
-      "id": "gis_heritage",
-      "label": "Welke erfgoedcontext geldt hier?",
-      "type": "select",
-      "options": [
-        "onbekend",
-        "geen",
-        "beschermd monument",
-        "inventaris bouwkundig erfgoed",
-        "UNESCO werelderfgoed of bufferzone"
       ]
     },
     {
       "id": "gis_water",
-      "label": "Ligt de handeling volledig of gedeeltelijk in de 5 meter-strook langs een bevaarbare of ingedeelde onbevaarbare waterloop, in de bedding ervan, in een erfdienstbaarheidszone langs een gracht van algemeen belang of in een afgebakende oeverzone? ",
+      "label": "Ligt de handeling in een beschermingsstrook van een waterloop, gracht van algemeen belang of oeverzone?",
       "type": "select",
       "options": [
         "onbekend",
         "ja",
         "nee",
         "ja maar met akkoord beheerder"
-      ]
-    },
-    {
-      "id": "gis_vulnerable",
-      "label": "Ligt de handeling in ruimtelijk kwetsbaar gebied?",
-      "type": "select",
-      "options": [
-        "onbekend",
-        "nee",
-        "parkgebied",
-        "ja"
-      ]
-    },
-    {
-      "id": "domain",
-      "label": "Waar gebeurt de handeling?",
-      "type": "select",
-      "options": [
-        "privaat domein",
-        "openbaar domein",
-        "wordt openbaar domein",
-        "onbekend"
       ]
     },
     {
@@ -145,20 +102,12 @@
       "reason": "De handeling past niet binnen uitdrukkelijke vergunningsvoorwaarden."
     },
     {
-      "id": "housing_units_change",
-      "kind": "not",
-      "when": {
-      "housing_units_change": "ja"
-    },
-    "reason": "Het aantal woonentiteiten wijzigt. De vrijstelling geldt alleen wanneer het aantal woonentiteiten gelijk blijft."
-    },
-    {
       "id": "water",
       "kind": "not",
       "when": {
         "gis_water": "ja"
       },
-      "reason": "De vrijstelling geldt niet in de 5m beschermingsstrook van waterlopen/grachten/oeverzones, behalve met akkoord of bij afbraak."
+      "reason": "De vrijstelling geldt niet in de beschermingsstrook van waterlopen/grachten/oeverzones, behalve met akkoord of bij afbraak."
     },
     {
       "id": "unknowns",
@@ -167,10 +116,7 @@
         "gis_rup_bpa",
         "gis_local_regulation_conflict",
         "gis_permit_conditions",
-        "housing_units_change",
-        "gis_heritage",
-        "gis_water",
-        "gis_vulnerable"
+        "gis_water"
       ],
       "reason": "Een of meer contextgegevens zijn nog niet zeker."
     }
@@ -230,37 +176,6 @@
         }
       ],
       "fail": "De Gentse ABR-regels voor opritten beperken aantal, breedte, helling en opritten in autovrij gebied."
-    },
-    "greenRoofGent": {
-      "questions": [
-        {
-          "id": "abr_roof_flat",
-          "label": "Heeft het nieuwe dak een helling van maximaal 15 graden?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        },
-        {
-          "id": "abr_roof_area",
-          "label": "Hoe groot is het nieuwe dak?",
-          "type": "number",
-          "unit": "m²"
-        },
-        {
-          "id": "abr_roof_solution",
-          "label": "Wordt een groendak of gelijkwaardige toegelaten oplossing voorzien?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        }
-      ],
-      "fail": "Volgens het ABR is bij nieuwe platte of licht hellende daken groter dan 6 m² vaak een groendak of gelijkwaardige oplossing nodig."
     },
     "pavingGent": {
       "questions": [
@@ -332,194 +247,706 @@
           ]
         }
       ],
-      "fail": "In Gent is een functiewijziging naar horeca vergunningsplichtig. Tijdelijke horeca kan enkel binnen de 4 x 30 dagen pop-up regeling en met lokale voorwaarden."
+      "fail": "In Gent is een functiewijziging naar horeca vergunningsplichtig. Tijdelijke horeca kan enkel binnen de 4 x 30 dagen-regel en met lokale voorwaarden."
+    },
+    "facadeStreetGent": {
+      "articles": [
+        "ABR art. 2.5",
+        "ABR art. 2.6",
+        "ABR art. 2.7"
+      ],
+      "questions": [
+        {
+          "id": "abr_facade_street_subject",
+          "label": "Heeft de gevel- of dakhandeling betrekking op één van de volgende situaties aan de straatzijde?",
+          "type": "multiselect",
+          "options": [
+            "geen van deze situaties",
+            "garage of garagepoort",
+            "etalage van een handelsruimte",
+            "uitsprong boven de openbare weg"
+          ],
+          "helpText": "Deze keuze bepaalt welke bijkomende Gentse ABR-vragen worden getoond."
+        },
+        {
+          "id": "abr_contact_street_ok",
+          "label": "Blijft het contact met de straat in overeenstemming met ABR artikel 2.5?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee",
+            "niet van toepassing"
+          ],
+          "helpText": "Beoordeel dit bij werken aan een garage of garagepoort aan de straatzijde.",
+          "showWhen": {
+            "abr_facade_street_subject": "garage of garagepoort"
+          }
+        },
+        {
+          "id": "abr_shopfront_closure",
+          "label": "Wordt een etalage van een handelsruimte voorzien van een gesloten gevelafsluiting?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee",
+            "niet van toepassing"
+          ],
+          "helpText": "ABR artikel 2.6 verbiedt gesloten gevelafsluitingen voor etalages van handelsruimtes.",
+          "showWhen": {
+            "abr_facade_street_subject": "etalage van een handelsruimte"
+          }
+        },
+        {
+          "id": "abr_projection_new_or_stability",
+          "label": "Gaat het om een nieuwe uitsprong of wordt bij de verbouwing geraakt aan de stabiliteit van een bestaande constructieve uitsprong?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "helpText": "Artikel 2.7 geldt altijd voor nieuwe uitsprongen. Een bestaande constructieve uitsprong moet ook worden aangepast wanneer de verbouwing raakt aan de stabiliteit van de uitsprong zelf.",
+          "showWhen": {
+            "abr_facade_street_subject": "uitsprong boven de openbare weg"
+          }
+        },
+        {
+          "id": "abr_projection_facade_on_building_line",
+          "label": "Staat de voorgevel tegen de rooilijn?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "showWhenAll": [
+            {
+              "field": "abr_facade_street_subject",
+              "equals": "uitsprong boven de openbare weg"
+            },
+            {
+              "field": "abr_projection_new_or_stability",
+              "equals": "ja"
+            }
+          ]
+        },
+        {
+          "id": "abr_projection_element_type",
+          "label": "Gaat het om een constructief of niet-constructief element?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "constructief element",
+            "niet-constructief element"
+          ],
+          "helpText": "Constructieve elementen zijn bijvoorbeeld een balkon, erker, geveluitbouw, deurdorpel, vast raamkader of vensterbank. Niet-constructieve elementen zijn bijvoorbeeld een regenpijp, uithangbord, luik, rolluik, zonnetent of luifel.",
+          "showWhenAll": [
+            {
+              "field": "abr_facade_street_subject",
+              "equals": "uitsprong boven de openbare weg"
+            },
+            {
+              "field": "abr_projection_new_or_stability",
+              "equals": "ja"
+            },
+            {
+              "field": "abr_projection_facade_on_building_line",
+              "equals": "ja"
+            }
+          ]
+        },
+        {
+          "id": "abr_projection_height_m",
+          "label": "Op welke hoogte boven het peil van het trottoir of de openbare weg bevindt het laagste punt van de uitsprong zich?",
+          "type": "number",
+          "unit": "m",
+          "helpText": "Meet de hoogte ter hoogte van de voorgevel op de rooilijn.",
+          "showWhenAll": [
+            {
+              "field": "abr_facade_street_subject",
+              "equals": "uitsprong boven de openbare weg"
+            },
+            {
+              "field": "abr_projection_new_or_stability",
+              "equals": "ja"
+            },
+            {
+              "field": "abr_projection_facade_on_building_line",
+              "equals": "ja"
+            }
+          ]
+        },
+        {
+          "id": "abr_projection_depth_cm",
+          "label": "Hoe ver springt het element maximaal voorbij de rooilijn?",
+          "type": "number",
+          "unit": "cm",
+          "showWhenAll": [
+            {
+              "field": "abr_facade_street_subject",
+              "equals": "uitsprong boven de openbare weg"
+            },
+            {
+              "field": "abr_projection_new_or_stability",
+              "equals": "ja"
+            },
+            {
+              "field": "abr_projection_facade_on_building_line",
+              "equals": "ja"
+            }
+          ]
+        },
+        {
+          "id": "abr_projection_full_facade",
+          "label": "Kraagt een volledig gevelvlak uit tot voorbij de rooilijn?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "showWhenAll": [
+            {
+              "field": "abr_facade_street_subject",
+              "equals": "uitsprong boven de openbare weg"
+            },
+            {
+              "field": "abr_projection_new_or_stability",
+              "equals": "ja"
+            },
+            {
+              "field": "abr_projection_facade_on_building_line",
+              "equals": "ja"
+            }
+          ]
+        },
+        {
+          "id": "abr_projection_facade_insulation",
+          "label": "Is de uitkraging van het volledige gevelvlak uitsluitend het gevolg van voorgevelisolatie?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee",
+            "niet van toepassing"
+          ],
+          "showWhenAll": [
+            {
+              "field": "abr_projection_full_facade",
+              "equals": "ja"
+            }
+          ]
+        },
+        {
+          "id": "abr_projection_beyond_insulation_cm",
+          "label": "Hoe ver springen kleinschalige constructieve elementen voorbij de voorgevelisolatie?",
+          "type": "number",
+          "unit": "cm",
+          "showWhenAll": [
+            {
+              "field": "abr_projection_facade_insulation",
+              "equals": "ja"
+            }
+          ]
+        },
+        {
+          "id": "abr_projection_attached_building",
+          "label": "Gaat het om aaneengesloten bebouwing?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "showWhenAll": [
+            {
+              "field": "abr_projection_element_type",
+              "equals": "constructief element"
+            },
+            {
+              "field": "abr_projection_new_or_stability",
+              "equals": "ja"
+            }
+          ]
+        },
+        {
+          "id": "abr_projection_side_distance_cm",
+          "label": "Wat is de kleinste afstand van de constructieve uitsprong tot een zijdelingse perceelsgrens?",
+          "type": "number",
+          "unit": "cm",
+          "helpText": "Deze afstand is relevant bij aaneengesloten bebouwing wanneer het constructieve element meer dan 20 cm voorbij de rooilijn uitspringt.",
+          "showWhenAll": [
+            {
+              "field": "abr_projection_attached_building",
+              "equals": "ja"
+            },
+            {
+              "field": "abr_projection_element_type",
+              "equals": "constructief element"
+            }
+          ]
+        },
+        {
+          "id": "abr_projection_context_ok_above_4m",
+          "label": "Is de uitsprong vanaf 4 meter hoogte verenigbaar met de plaatselijke context en de geldende voorschriften van het bestemmingsplan?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee",
+            "niet van toepassing"
+          ],
+          "showWhenAll": [
+            {
+              "field": "abr_facade_street_subject",
+              "equals": "uitsprong boven de openbare weg"
+            },
+            {
+              "field": "abr_projection_new_or_stability",
+              "equals": "ja"
+            }
+          ]
+        }
+      ],
+      "fail": "De gevel- of dakhandeling voldoet niet aan de toepasselijke voorwaarden van ABR artikel 2.5, 2.6 of 2.7. Voor artikel 2.7 worden hoogte, type element, uitsprong voorbij de rooilijn, volledige geveluitkraging, gevelisolatie en afstand tot de zijdelingse perceelsgrens afzonderlijk getoetst.",
+      "resultMode": "additional_regulation",
+      "article27Rules": {
+        "heightBands": [
+          {
+            "minHeightM": 0,
+            "maxHeightM": 2.2,
+            "constructiveMaxCm": 10,
+            "nonConstructiveMaxCm": 10
+          },
+          {
+            "minHeightM": 2.2,
+            "maxHeightM": 3,
+            "constructiveMaxCm": 10,
+            "nonConstructiveMaxCm": 20
+          },
+          {
+            "minHeightM": 3,
+            "maxHeightM": 4,
+            "constructiveMaxCm": 20,
+            "nonConstructiveMaxCm": 60
+          },
+          {
+            "minHeightM": 4,
+            "maxHeightM": null,
+            "contextAssessmentRequired": true
+          }
+        ],
+        "fullFacadeProjectionAllowed": false,
+        "fullFacadeInsulationException": true,
+        "smallConstructiveElementsBeyondInsulationMaxCm": 5,
+        "sideBoundaryRule": {
+          "appliesTo": "constructief element",
+          "projectionMoreThanCm": 20,
+          "minimumDistanceCm": 60,
+          "onlyAttachedBuildings": true
+        },
+        "existingProjectionRule": "Bestaande constructieve uitsprongen mogen behouden blijven, tenzij de verbouwing raakt aan de stabiliteit van de uitsprong zelf.",
+        "deviationPossible": true
+      }
+    },
+    "housingQualityGent": {
+      "articles": [
+        "ABR art. 4.2-4.10",
+        "ABR art. 4.16-4.21"
+      ],
+      "resultMode": "additional_regulation",
+      "questions": [
+        {
+          "id": "abr_inside_affects_quality",
+          "label": "Heeft de binnenverbouwing gevolgen voor de indeling, afmetingen, vrije hoogte, daglichttoetreding, bereikbaarheid of private buitenruimte van de woning?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "helpText": "Kies ja als woonruimtes worden gemaakt, verwijderd, opgesplitst, verkleind of anders ingericht, als raamopeningen of toegangen wijzigen, of als een private buitenruimte wordt ingenomen."
+        },
+        {
+          "id": "abr_inside_housing_type_change",
+          "label": "Wijzigt het woningtype of de woonvorm door de verbouwing?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "helpText": "Bijvoorbeeld: eengezinswoning naar meergezinswoning, appartement naar studio, woning naar kamerwoning of het creëren van een hospitawoning."
+        },
+        {
+          "id": "abr_inside_existing_housing_type",
+          "label": "Welk bestaand woningtype wordt verbouwd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "eengezinswoning",
+            "schakelwoning",
+            "appartement",
+            "studio",
+            "kamer in een kamerwoning",
+            "kamer in een hospitawoning",
+            "ander woningtype"
+          ],
+          "showWhen": {
+            "abr_inside_affects_quality": "ja"
+          }
+        },
+        {
+          "id": "abr_inside_changed_components",
+          "label": "Welke onderdelen worden door de binnenverbouwing gewijzigd?",
+          "type": "multiselect",
+          "options": [
+            "woonkamer",
+            "keuken",
+            "slaapkamer",
+            "berging",
+            "sanitaire ruimte",
+            "vrije hoogte",
+            "daglichtopeningen",
+            "toegang of interne circulatie",
+            "private buitenruimte"
+          ],
+          "showWhen": {
+            "abr_inside_affects_quality": "ja"
+          },
+          "helpText": "Selecteer alleen de onderdelen waarop de verbouwing daadwerkelijk invloed heeft."
+        },
+        {
+          "id": "abr_inside_living_area_m2",
+          "label": "Wat is de netto vloeroppervlakte van de woonkamer na de werken?",
+          "type": "number",
+          "unit": "m²",
+          "showWhenIncludes": {
+            "abr_inside_changed_components": "woonkamer"
+          }
+        },
+        {
+          "id": "abr_inside_kitchen_integrated",
+          "label": "Is de keuken geïntegreerd in de woonkamer?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "showWhenIncludes": {
+            "abr_inside_changed_components": "keuken"
+          }
+        },
+        {
+          "id": "abr_inside_separate_kitchen_area_m2",
+          "label": "Wat is de netto vloeroppervlakte van de afzonderlijke keuken na de werken?",
+          "type": "number",
+          "unit": "m²",
+          "showWhenAll": [
+            {
+              "field": "abr_inside_changed_components",
+              "includes": "keuken"
+            },
+            {
+              "field": "abr_inside_kitchen_integrated",
+              "equals": "nee"
+            }
+          ]
+        },
+        {
+          "id": "abr_inside_bedroom_count",
+          "label": "Hoeveel slaapkamers heeft de woning na de werken?",
+          "type": "number",
+          "showWhenIncludes": {
+            "abr_inside_changed_components": "slaapkamer"
+          }
+        },
+        {
+          "id": "abr_inside_first_bedroom_area_m2",
+          "label": "Wat is de netto vloeroppervlakte van de grootste of eerste slaapkamer na de werken?",
+          "type": "number",
+          "unit": "m²",
+          "showWhenIncludes": {
+            "abr_inside_changed_components": "slaapkamer"
+          }
+        },
+        {
+          "id": "abr_inside_smallest_other_bedroom_area_m2",
+          "label": "Wat is de netto vloeroppervlakte van de kleinste bijkomende slaapkamer?",
+          "type": "number",
+          "unit": "m²",
+          "helpText": "Vul dit alleen in als de woning na de werken meer dan één slaapkamer heeft.",
+          "showWhenAll": [
+            {
+              "field": "abr_inside_changed_components",
+              "includes": "slaapkamer"
+            },
+            {
+              "field": "abr_inside_bedroom_count",
+              "greaterThan": 1
+            }
+          ]
+        },
+        {
+          "id": "abr_inside_storage_area_m2",
+          "label": "Wat is de oppervlakte van de individuele functionele berging binnen de woning na de werken?",
+          "type": "number",
+          "unit": "m²",
+          "showWhenIncludes": {
+            "abr_inside_changed_components": "berging"
+          }
+        },
+        {
+          "id": "abr_inside_min_clear_height_m",
+          "label": "Wat is de kleinste vrije hoogte in de gewijzigde woonkamer, keuken of slaapkamer?",
+          "type": "number",
+          "unit": "m",
+          "showWhenIncludes": {
+            "abr_inside_changed_components": "vrije hoogte"
+          }
+        },
+        {
+          "id": "abr_inside_daylight_room_type",
+          "label": "Voor welk type gewijzigde ruimte wil je de daglichttoetreding controleren?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "woonkamer",
+            "keuken",
+            "slaapkamer",
+            "studio",
+            "kamer"
+          ],
+          "showWhenIncludes": {
+            "abr_inside_changed_components": "daglichtopeningen"
+          }
+        },
+        {
+          "id": "abr_inside_daylight_room_area_m2",
+          "label": "Wat is de netto vloeroppervlakte van deze ruimte?",
+          "type": "number",
+          "unit": "m²",
+          "showWhenIncludes": {
+            "abr_inside_changed_components": "daglichtopeningen"
+          }
+        },
+        {
+          "id": "abr_inside_daylight_opening_area_m2",
+          "label": "Wat is de totale bruikbare oppervlakte van de daglichtopeningen van deze ruimte?",
+          "type": "number",
+          "unit": "m²",
+          "showWhenIncludes": {
+            "abr_inside_changed_components": "daglichtopeningen"
+          }
+        },
+        {
+          "id": "abr_inside_direct_access",
+          "label": "Blijft elke woning rechtstreeks toegankelijk vanaf de openbare weg zonder een andere woning te betreden?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "showWhenIncludes": {
+            "abr_inside_changed_components": "toegang of interne circulatie"
+          }
+        },
+        {
+          "id": "abr_inside_fixed_stair",
+          "label": "Blijft iedere gebruikte bouwlaag bereikbaar via een vaste binnen- of buitentrap?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee",
+            "niet van toepassing"
+          ],
+          "showWhenIncludes": {
+            "abr_inside_changed_components": "toegang of interne circulatie"
+          }
+        },
+        {
+          "id": "abr_inside_access_via_garage",
+          "label": "Verloopt de toegang tot de woning uitsluitend via een afgesloten autobergplaats?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "showWhenIncludes": {
+            "abr_inside_changed_components": "toegang of interne circulatie"
+          }
+        },
+        {
+          "id": "abr_inside_private_outdoor_remains",
+          "label": "Blijft na de werken een kwalitatieve private buitenruimte bij de woning behouden?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "showWhenIncludes": {
+            "abr_inside_changed_components": "private buitenruimte"
+          }
+        },
+        {
+          "id": "abr_inside_studio_area_m2",
+          "label": "Wat is de netto vloeroppervlakte van de bestaande studio na de werken?",
+          "type": "number",
+          "unit": "m²",
+          "showWhenAll": [
+            {
+              "field": "abr_inside_affects_quality",
+              "equals": "ja"
+            },
+            {
+              "field": "abr_inside_existing_housing_type",
+              "equals": "studio"
+            }
+          ]
+        },
+        {
+          "id": "abr_inside_room_area_m2",
+          "label": "Wat is de netto vloeroppervlakte van de kamer na de werken?",
+          "type": "number",
+          "unit": "m²",
+          "showWhenAny": [
+            {
+              "field": "abr_inside_existing_housing_type",
+              "equals": "kamer in een kamerwoning"
+            },
+            {
+              "field": "abr_inside_existing_housing_type",
+              "equals": "kamer in een hospitawoning"
+            }
+          ]
+        },
+        {
+          "id": "abr_inside_room_private_kitchen",
+          "label": "Heeft de kamer een eigen kookgelegenheid?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "showWhenAny": [
+            {
+              "field": "abr_inside_existing_housing_type",
+              "equals": "kamer in een kamerwoning"
+            },
+            {
+              "field": "abr_inside_existing_housing_type",
+              "equals": "kamer in een hospitawoning"
+            }
+          ]
+        },
+        {
+          "id": "abr_inside_room_private_bathroom",
+          "label": "Heeft de kamer een eigen badkamer met bad of douche?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "showWhenAny": [
+            {
+              "field": "abr_inside_existing_housing_type",
+              "equals": "kamer in een kamerwoning"
+            },
+            {
+              "field": "abr_inside_existing_housing_type",
+              "equals": "kamer in een hospitawoning"
+            }
+          ]
+        }
+      ],
+      "rules": {
+        "simpleRouteStops": [
+          {
+            "field": "abr_inside_housing_type_change",
+            "equals": "ja",
+            "result": "not_simple_exemption_route",
+            "reason": "Het woningtype of de woonvorm wijzigt. Deze ingreep valt niet onder de eenvoudige vrijstellingsroute voor binnenverbouwingen."
+          }
+        ],
+        "thresholds": {
+          "dwellingTypes": [
+            "eengezinswoning",
+            "schakelwoning",
+            "appartement",
+            "kamer in een hospitawoning"
+          ],
+          "livingRoomMinM2": 24,
+          "livingRoomWithIntegratedKitchenExtraM2": 3,
+          "integratedKitchenExtraException": "woning met slechts één slaapkamer",
+          "separateKitchenMinM2": 6,
+          "firstBedroomMinM2": 11,
+          "otherBedroomMinM2": 7,
+          "storageMinM2": 3,
+          "clearHeightRenovationMinM": 2.2,
+          "studioMinM2": 30,
+          "roomBaseMinM2": 12,
+          "roomExtraPerPrivateFacilityM2": 3,
+          "daylightRatio": {
+            "woonkamer": 0.1,
+            "keuken": 0.1,
+            "studio": 0.1,
+            "kamer": 0.1,
+            "slaapkamer": 0.0833333333
+          },
+          "daylightAbsoluteMinimumM2": {
+            "woonkamer": 1,
+            "keuken": 1,
+            "slaapkamer": 1
+          }
+        },
+        "failConditions": [
+          {
+            "field": "abr_inside_direct_access",
+            "equals": "nee"
+          },
+          {
+            "field": "abr_inside_fixed_stair",
+            "equals": "nee"
+          },
+          {
+            "field": "abr_inside_access_via_garage",
+            "equals": "ja"
+          },
+          {
+            "field": "abr_inside_private_outdoor_remains",
+            "equals": "nee"
+          }
+        ]
+      },
+      "fail": "De binnenverbouwing voldoet op basis van de ingevulde gegevens mogelijk niet aan de toepasselijke woonkwaliteitsregels van het Gentse ABR."
     }
   },
   "themes": [
     {
-      "id": "woning_gevel_dak",
+      "id": "woning_ondergronds",
       "chapter": "H2",
-      "title": "Ik wil gevel- of dakwerken uitvoeren aan een woning",
-      "article": "Art. 2.1, 2° en 2.2",
+      "title": "Ik wil een gebruikelijke ondergrondse constructie plaatsen bij een woning",
+      "article": "Art. 2.1, 1° en 2.2",
       "tags": [],
-      "questions": [
-        {
-          "id": "legal",
-          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        },
-        {
-          "id": "same_volume",
-          "label": "Blijft het fysieke bouwvolume gelijk?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        },
-        {
-          "id": "energy",
-          "label": "Verslechtert de energieprestatie na de werken?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        },
-        {
-          "id": "heritage_visible",
-          "label": "Gaat het om een zichtbaar gevel- of dakelement in inventaris/UNESCO-context?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        }
-      ],
-      "abr": [],
-      "passText": "Vrijstelling mogelijk voor gevel- en dakwerken zonder volume-uitbreiding en zonder slechtere energieprestatie."
-    },
-    {
-      "id": "woning_isolatie",
-      "chapter": "H2",
-      "title": "Ik wil buitenisolatie plaatsen aan een woning",
-      "article": "Art. 2.1, 2/1° en 2.2",
-      "tags": [
-"isolatie",
-  "buitenisolatie",
-  "gevel",
-  "gevelisolatie",
-  "dak",
-  "dakisolatie",
-  "energie"
-],
-      "questions": [
-        {
-          "id": "legal",
-          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        },
-        {
-          "id": "insulation_cm",
-          "label": "Hoe dik is de isolatie inclusief afwerking?",
-          "type": "number",
-          "unit": "cm"
-        },
-        {
-          "id": "cross_rooilijn",
-          "label": "Overschrijdt de isolatie de rooilijn?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        },
-        {
-          "id": "heritage_visible",
-          "label": "Gaat het om inventaris- of UNESCO-context?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        }
-      ],
-      "abr": [],
-      "passText": "Vrijstelling mogelijk tot 26 cm, zonder rooilijnoverschrijding en met erfgoedfilter."
-    },
-    {
-      "id": "woning_zonnepanelen",
-      "chapter": "H2",
-      "title": "Ik wil zonnepanelen of een zonneboiler plaatsen bij een woning",
-      "article": "Art. 2.1, 3° en 2.2",
-      "tags": [
-        "zonnepanelen",
-        "zonneboiler",
-        "dak",
-        "gevel",
-        "erfgoed"
-      ],
-      "questions": [
-        {
-          "id": "mainlyPermitted",
-          "label": "Is de woning hoofdzakelijk vergund of vergund geacht?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        },
-        {
-          "id": "placementType",
-          "label": "Waar worden de zonnepanelen of zonneboiler geplaatst?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "op een plat dak",
-            "in of op een hellend dakvlak",
-            "op een gevel",
-            "aan een balkonafsluiting",
-            "op een andere plaats"
-          ]
-        },
-        {
-          "id": "heightAboveRoofEdgeM",
-          "label": "Hoeveel meter komen ze boven de dakrand uit? Vul dit enkel in bij plaatsing op een plat dak.",
-          "type": "number",
-          "unit": "m"
-        },
-        {
-          "id": "facadeAreaM2",
-          "label": "Wat is de totale oppervlakte op deze gevel? Vul dit enkel in bij plaatsing op een gevel.",
-          "type": "number",
-          "unit": "m² per gevel"
-        },
-        {
-          "id": "worldHeritageZone",
-          "label": "Ligt de woning in werelderfgoed of in een bufferzone van werelderfgoed?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        },
-        {
-          "id": "inventoryHeritageNotProtected",
-          "label": "Is de woning opgenomen in de vastgestelde inventaris van bouwkundig erfgoed?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        }
-      ],
-      "abr": [],
-      "passText": "Vrijstelling mogelijk wanneer de woning hoofdzakelijk vergund of vergund geacht is en de zonnepanelen of zonneboiler geplaatst worden op een toegelaten plaatsingswijze. Voor plaatsing op een plat dak geldt maximaal 1 meter boven de dakrand. Voor plaatsing op een gevel geldt maximaal 4 m² per gevel. In werelderfgoedcontext of bij een inventarispand geldt een bijkomende erfgoedfilter."
-    },
-    {
-      "id": "woning_binnen",
-      "chapter": "H2",
-      "title": "Ik wil binnen verbouwen in een woning",
-      "article": "Art. 2.1, 4° en 2.2",
-      "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
       "questions": [
         {
           "id": "legal",
@@ -533,7 +960,7 @@
         },
         {
           "id": "function_change",
-          "label": "Wijzigt de vergunningsplichtige functie?",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
           "type": "select",
           "options": [
             "onbekend",
@@ -543,7 +970,27 @@
         },
         {
           "id": "housing_units",
-          "label": "Blijft het aantal woongelegenheden gelijk?",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "underground_plan_conflict",
+          "label": "Is de constructie strijdig met een goedgekeurd rooilijnplan, een daarin opgenomen achteruitbouwstrook of een goedgekeurd onteigeningsplan?",
           "type": "select",
           "options": [
             "onbekend",
@@ -553,14 +1000,519 @@
         }
       ],
       "abr": [],
-      "passText": "Vrijstelling mogelijk bij binnenverbouwingen zonder vergunningsplichtige functiewijziging en zonder wijziging van het aantal woongelegenheden."
+      "passText": "Vrijstelling mogelijk voor een gebruikelijke ondergrondse constructie die niet strijdig is met de vermelde plannen.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "underground_plan_conflict",
+            "equals": "ja",
+            "reason": "De ondergrondse constructie is strijdig met een goedgekeurd rooilijn-, achteruitbouw- of onteigeningsplan."
+          }
+        ]
+      }
+    },
+    {
+      "id": "woning_gevel_dak",
+      "chapter": "H2",
+      "title": "Ik wil gevel- of dakwerken uitvoeren aan een woning",
+      "article": "Art. 2.1, 2° en 2.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "same_volume",
+          "label": "Blijft het fysieke bouwvolume ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "energy",
+          "label": "Wordt de energieprestatie na de werken slechter?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "heritage_context",
+          "label": "Welke erfgoedcontext geldt voor het gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "geen van deze",
+            "werelderfgoed of UNESCO-bufferzone",
+            "vastgestelde inventaris bouwkundig erfgoed, niet beschermd",
+            "beschermd onroerend erfgoed"
+          ],
+          "helpText": "Werelderfgoed of UNESCO-bufferzone en een vastgesteld inventarispand dat niet beschermd is, sluiten deze specifieke vrijstellingsroute uit. Voor beschermd erfgoed geldt een afzonderlijk toelatingsstelsel."
+        }
+      ],
+      "abr": [
+        "facadeStreetGent"
+      ],
+      "passText": "Vrijstelling mogelijk zonder wijziging van het fysieke bouwvolume, zonder verslechtering van de energieprestatie en buiten de uitgesloten erfgoedcontexten.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "same_volume",
+            "equals": "nee",
+            "reason": "Het fysieke bouwvolume wijzigt."
+          },
+          {
+            "field": "energy",
+            "equals": "ja",
+            "reason": "De energieprestatie wordt na de werken slechter."
+          },
+          {
+            "field": "heritage_context",
+            "in": [
+              "werelderfgoed of UNESCO-bufferzone",
+              "vastgestelde inventaris bouwkundig erfgoed, niet beschermd"
+            ],
+            "reason": "Deze handeling valt in deze erfgoedcontext niet onder de vrijstellingsroute."
+          }
+        ],
+        "researchConditions": [
+          {
+            "field": "heritage_context",
+            "in": [
+              "beschermd onroerend erfgoed"
+            ],
+            "reason": "Voor beschermd onroerend erfgoed moet het afzonderlijke toelatingsstelsel worden gecontroleerd."
+          }
+        ]
+      }
+    },
+    {
+      "id": "woning_isolatie",
+      "chapter": "H2",
+      "title": "Ik wil buitenisolatie plaatsen aan een woning",
+      "article": "Art. 2.1, 2/1° en 2.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "insulation_cm",
+          "label": "Hoe dik is de isolatie inclusief gebruikelijke afwerking?",
+          "type": "number",
+          "unit": "cm"
+        },
+        {
+          "id": "insulation_parts",
+          "label": "Waar wordt de buitenisolatie aangebracht?",
+          "type": "multiselect",
+          "options": [
+            "voorgevel",
+            "zijgevel",
+            "achtergevel",
+            "buitenzijde van het dak"
+          ]
+        },
+        {
+          "id": "insulation_crosses_building_line",
+          "label": "Wordt door de isolatie of afwerking een rooilijn overschreden?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee",
+            "niet van toepassing"
+          ],
+          "helpText": "Elke overschrijding van een rooilijn sluit deze vrijstellingsroute uit."
+        },
+        {
+          "id": "heritage_context",
+          "label": "Welke erfgoedcontext geldt voor het gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "geen van deze",
+            "werelderfgoed of UNESCO-bufferzone",
+            "vastgestelde inventaris bouwkundig erfgoed, niet beschermd",
+            "beschermd onroerend erfgoed"
+          ],
+          "helpText": "Werelderfgoed of UNESCO-bufferzone en een vastgesteld inventarispand dat niet beschermd is, sluiten deze specifieke vrijstellingsroute uit. Voor beschermd erfgoed geldt een afzonderlijk toelatingsstelsel."
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor buitenisolatie inclusief gebruikelijke afwerking tot 26 cm, zonder overschrijding van een rooilijn en buiten de uitgesloten erfgoedcontexten.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "insulation_cm",
+            "greaterThan": 26,
+            "reason": "De isolatie inclusief afwerking is dikker dan 26 cm."
+          },
+          {
+            "field": "insulation_crosses_building_line",
+            "equals": "ja",
+            "reason": "De isolatie of afwerking overschrijdt een rooilijn."
+          },
+          {
+            "field": "heritage_context",
+            "in": [
+              "werelderfgoed of UNESCO-bufferzone",
+              "vastgestelde inventaris bouwkundig erfgoed, niet beschermd"
+            ],
+            "reason": "Deze handeling valt in deze erfgoedcontext niet onder de vrijstellingsroute."
+          }
+        ],
+        "researchConditions": [
+          {
+            "field": "heritage_context",
+            "in": [
+              "beschermd onroerend erfgoed"
+            ],
+            "reason": "Voor beschermd onroerend erfgoed moet het afzonderlijke toelatingsstelsel worden gecontroleerd."
+          }
+        ]
+      }
+    },
+    {
+      "id": "woning_zonnepanelen",
+      "chapter": "H2",
+      "title": "Ik wil zonnepanelen of een zonneboiler plaatsen bij een woning",
+      "article": "Art. 2.1, 3° en 2.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "placementType",
+          "label": "Waar worden de zonnepanelen of de zonneboiler geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "op een plat dak",
+            "in of op een hellend dakvlak",
+            "op een gevel",
+            "aan een balkonafsluiting",
+            "op een andere plaats"
+          ]
+        },
+        {
+          "id": "heightAboveRoofEdgeM",
+          "label": "Hoeveel meter komt de installatie boven de dakrand uit?",
+          "type": "number",
+          "unit": "m",
+          "showWhen": {
+            "placementType": "op een plat dak"
+          }
+        },
+        {
+          "id": "facadeAreaM2",
+          "label": "Wat is de totale oppervlakte van de installatie op deze gevel?",
+          "type": "number",
+          "unit": "m² per gevel",
+          "showWhen": {
+            "placementType": "op een gevel"
+          }
+        },
+        {
+          "id": "heritage_context",
+          "label": "Welke erfgoedcontext geldt voor het gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "geen van deze",
+            "werelderfgoed of UNESCO-bufferzone",
+            "vastgestelde inventaris bouwkundig erfgoed, niet beschermd",
+            "beschermd onroerend erfgoed"
+          ],
+          "helpText": "Werelderfgoed of UNESCO-bufferzone en een vastgesteld inventarispand dat niet beschermd is, sluiten deze specifieke vrijstellingsroute uit. Voor beschermd erfgoed geldt een afzonderlijk toelatingsstelsel.",
+          "showWhen": {
+            "placementType": [
+              "op een gevel",
+              "aan een balkonafsluiting"
+            ]
+          }
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk bij een toegelaten plaatsingsvorm en, bij gevel of balkonafsluiting, buiten de uitgesloten erfgoedcontexten.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "placementType",
+            "equals": "op een andere plaats",
+            "reason": "De gekozen plaatsingswijze is niet opgenomen in deze vrijstellingsroute."
+          },
+          {
+            "all": [
+              {
+                "field": "placementType",
+                "equals": "op een plat dak"
+              },
+              {
+                "field": "heightAboveRoofEdgeM",
+                "greaterThan": 1
+              }
+            ],
+            "reason": "De installatie komt meer dan 1 meter boven de dakrand uit."
+          },
+          {
+            "all": [
+              {
+                "field": "placementType",
+                "equals": "op een gevel"
+              },
+              {
+                "field": "facadeAreaM2",
+                "greaterThan": 4
+              }
+            ],
+            "reason": "De installatie is groter dan 4 m² op deze gevel."
+          },
+          {
+            "field": "heritage_context",
+            "in": [
+              "werelderfgoed of UNESCO-bufferzone",
+              "vastgestelde inventaris bouwkundig erfgoed, niet beschermd"
+            ],
+            "reason": "Deze handeling valt in deze erfgoedcontext niet onder de vrijstellingsroute."
+          }
+        ],
+        "researchConditions": [
+          {
+            "field": "heritage_context",
+            "in": [
+              "beschermd onroerend erfgoed"
+            ],
+            "reason": "Voor beschermd onroerend erfgoed moet het afzonderlijke toelatingsstelsel worden gecontroleerd."
+          }
+        ]
+      }
+    },
+    {
+      "id": "woning_binnen",
+      "chapter": "H2",
+      "title": "Ik wil binnen verbouwen in een woning",
+      "article": "Art. 2.1, 4° en 2.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [
+        "housingQualityGent"
+      ],
+      "passText": "Vrijstelling mogelijk voor binnenverbouwingen zonder vergunningsplichtige functiewijziging en zonder wijziging van het aantal woongelegenheden."
     },
     {
       "id": "woning_afsluiting",
       "chapter": "H2",
       "title": "Ik wil een afsluiting of poort plaatsen bij een woning",
-      "article": "Art. 2.1, 5°-7°",
+      "article": "Art. 2.1, 5°-7° en 2.2",
       "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
       "questions": [
         {
           "id": "legal",
@@ -570,47 +1522,162 @@
             "onbekend",
             "ja",
             "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "fence_type",
+          "label": "Wat wordt geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "afsluiting",
+            "toegangspoort"
           ]
         },
         {
           "id": "fence_location",
-          "label": "Waar komt de afsluiting?",
+          "label": "Waar wordt de afsluiting of toegangspoort geplaatst?",
           "type": "select",
           "options": [
             "onbekend",
+            "voortuin",
             "zijtuin",
             "achtertuin",
-            "voortuin",
-            "toegangspoort",
-            "open afsluiting"
+            "meerdere tuinzones"
+          ]
+        },
+        {
+          "id": "fence_openness",
+          "label": "Is de afsluiting of toegangspoort open of gesloten?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "open",
+            "gesloten"
           ]
         },
         {
           "id": "fence_height",
-          "label": "Hoe hoog wordt de afsluiting of poort?",
+          "label": "Hoe hoog wordt de afsluiting of toegangspoort?",
           "type": "number",
           "unit": "m"
         },
         {
-          "id": "fence_closed_front",
-          "label": "Is het een gesloten afsluiting in de voortuin?",
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
           "type": "select",
           "options": [
             "onbekend",
             "ja",
             "nee"
+          ],
+          "showWhenAll": [
+            {
+              "field": "fence_type",
+              "equals": "afsluiting"
+            },
+            {
+              "field": "fence_openness",
+              "equals": "gesloten"
+            },
+            {
+              "field": "fence_location",
+              "in": [
+                "zijtuin",
+                "achtertuin"
+              ]
+            }
           ]
         }
       ],
       "abr": [],
-      "passText": "Vrijstelling mogelijk tot 2 m in zij- en achtertuin, voor toegangspoorten/open afsluitingen tot 2 m, en gesloten voortuinafsluiting tot 1 m."
+      "passText": "Vrijstelling mogelijk binnen de toepasselijke hoogtevoorwaarden. De 30-meterregel geldt voor gesloten afsluitingen in zij- en achtertuin.",
+      "rules": {
+        "heightRules": [
+          {
+            "when": {
+              "fence_location": "voortuin",
+              "fence_openness": "gesloten"
+            },
+            "maxHeightM": 1
+          },
+          {
+            "when": {
+              "fence_openness": "open"
+            },
+            "maxHeightM": 2
+          },
+          {
+            "when": {
+              "fence_location": [
+                "zijtuin",
+                "achtertuin"
+              ],
+              "fence_openness": "gesloten"
+            },
+            "maxHeightM": 2
+          }
+        ],
+        "notConditions": [
+          {
+            "all": [
+              {
+                "field": "fence_type",
+                "equals": "afsluiting"
+              },
+              {
+                "field": "fence_location",
+                "in": [
+                  "zijtuin",
+                  "achtertuin"
+                ]
+              },
+              {
+                "field": "within_30m",
+                "equals": "nee"
+              }
+            ],
+            "reason": "Een gesloten afsluiting in zij- of achtertuin moet voor deze route binnen 30 meter van de woning liggen."
+          }
+        ]
+      }
     },
     {
       "id": "woning_niet_overdekt",
       "chapter": "H2",
-      "title": "Ik wil een terras, zwembad of andere niet-overdekte constructie plaatsen bij een woning",
+      "title": "Ik wil een terras, zwembad, verharding of andere niet-overdekte constructie plaatsen bij een woning",
       "article": "Art. 2.1, 8° en 2.2",
       "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
       "questions": [
         {
           "id": "legal",
@@ -623,8 +1690,8 @@
           ]
         },
         {
-          "id": "garden_zone",
-          "label": "Ligt de constructie in zijtuin of achtertuin?",
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
           "type": "select",
           "options": [
             "onbekend",
@@ -633,20 +1700,77 @@
           ]
         },
         {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "vulnerable_area_type",
+          "label": "Welke planologische context geldt op de plaats van de handeling?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "geen ruimtelijk kwetsbaar gebied",
+            "parkgebied",
+            "ander ruimtelijk kwetsbaar gebied"
+          ],
+          "helpText": "Voor deze handeling is een ander ruimtelijk kwetsbaar gebied dan parkgebied uitgesloten."
+        },
+        {
+          "id": "garden_location",
+          "label": "Waar ligt de constructie?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "voortuin",
+            "zijtuin",
+            "achtertuin",
+            "meerdere tuinzones"
+          ]
+        },
+        {
           "id": "area_total",
-          "label": "Wat is de gezamenlijke oppervlakte van alle niet-overdekte constructies?",
+          "label": "Gezamenlijke oppervlakte inclusief bestaande niet-overdekte constructies in zij- en achtertuin",
           "type": "number",
           "unit": "m²"
         },
         {
+          "id": "against_existing_wall",
+          "label": "Wordt de constructie tegen een bestaande scheidingsmuur geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
           "id": "distance_boundary",
-          "label": "Minimale afstand tot perceelsgrens, tenzij tegen bestaande scheidingsmuur",
+          "label": "Wat is de kortste afstand tot de perceelsgrens?",
           "type": "number",
-          "unit": "m"
+          "unit": "m",
+          "showWhen": {
+            "against_existing_wall": "nee"
+          }
         },
         {
           "id": "rain_own",
-          "label": "Blijft hemelwater op eigen terrein?",
+          "label": "Blijft het hemelwater op eigen terrein?",
           "type": "select",
           "options": [
             "onbekend",
@@ -658,75 +1782,204 @@
       "abr": [
         "pavingGent"
       ],
-      "passText": "Vrijstelling mogelijk voor niet-overdekte constructies in zij- of achtertuin tot samen 80 m²."
-    },
-{
-  "id": "woning_airco",
-  "chapter": "H2",
-  "title": "Ik wil een warmtepomp of airco plaatsen bij een woning",
-  "article": "Art. 2.1, 8°/1",
-  "tags": [
-    "warmtepomp",
-    "airco",
-    "buitendeel",
-    "tuin",
-    "gevel",
-    "plat dak"
-  ],
-  "questions": [
-    {
-      "id": "legal",
-      "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
-      "type": "select",
-      "options": [
-        "onbekend",
-        "ja",
-        "nee"
-      ]
-    },
-    {
-      "id": "airco_place",
-      "label": "Waar komt het buitendeel?",
-      "type": "select",
-      "options": [
-        "onbekend",
-        "achtertuin",
-        "voortuin",
-        "gevel",
-        "plat dak",
-        "ander"
-      ]
+      "passText": "Vrijstelling mogelijk in zij- of achtertuin tot 80 m², op minstens 1 meter van de perceelsgrens of tegen een bestaande scheidingsmuur, met hemelwater op eigen terrein en buiten uitgesloten kwetsbaar gebied.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "garden_location",
+            "equals": "voortuin",
+            "reason": "Deze vrijstelling geldt niet in de voortuin."
+          },
+          {
+            "all": [
+              {
+                "field": "against_existing_wall",
+                "equals": "nee"
+              },
+              {
+                "field": "distance_boundary",
+                "lessThan": 1
+              }
+            ],
+            "reason": "De constructie ligt op minder dan 1 meter van de perceelsgrens en niet tegen een bestaande scheidingsmuur."
+          },
+          {
+            "field": "area_total",
+            "greaterThan": 80,
+            "reason": "De gezamenlijke oppervlakte overschrijdt 80 m²."
+          },
+          {
+            "field": "vulnerable_area_type",
+            "equals": "ander ruimtelijk kwetsbaar gebied",
+            "reason": "Deze handeling is uitgesloten in ruimtelijk kwetsbaar gebied, behalve parkgebied."
+          }
+        ]
+      }
     },
     {
-      "id": "airco_distance",
-      "label": "Wat is de afstand van het buitendeel tot de perceelsgrens?",
-      "type": "number",
-      "unit": "m"
-    },
-    {
-      "id": "airco_against_wall",
-      "label": "Wordt het buitendeel tegen een bestaande scheidingsmuur geplaatst?",
-      "type": "select",
-      "options": [
-        "onbekend",
-        "ja",
-        "nee"
-      ]
-    }
-  ],
-  "abr": [],
-  "passText": "Vrijstelling mogelijk in de tuin, op een gevel of op een plat dak wanneer het buitendeel minstens 2 meter afstand houdt tot de perceelsgrens, of tegen een bestaande scheidingsmuur wordt geplaatst."
-},
-    {
-      "id": "woning_oprit",
+      "id": "woning_airco",
       "chapter": "H2",
-      "title": "Ik wil een oprit of toegang aanleggen bij een woning",
-      "article": "Art. 2.1, 9° en 12/1.3",
+      "title": "Ik wil een warmtepomp of airco plaatsen bij een woning",
+      "article": "Art. 2.1, 8°/1 en 2.2",
       "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
       "questions": [
         {
           "id": "legal",
           "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "airco_place",
+          "label": "Waar wordt het bovengrondse onderdeel geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "tuin",
+            "gevel",
+            "plat dak",
+            "andere plaats"
+          ]
+        },
+        {
+          "id": "airco_against_existing_party_wall",
+          "label": "Wordt het onderdeel tegen een bestaande scheidingsmuur op de perceelsgrens geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "airco_distance_boundary",
+          "label": "Wat is de kortste afstand tot de perceelsgrens?",
+          "type": "number",
+          "unit": "m",
+          "showWhen": {
+            "airco_against_existing_party_wall": "nee"
+          }
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk in de tuin, op een gevel of op een plat dak, tegen een bestaande scheidingsmuur of op minstens 2 meter van de perceelsgrens.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "airco_place",
+            "equals": "andere plaats",
+            "reason": "De gekozen plaats ligt niet in deze vrijstellingsroute."
+          },
+          {
+            "all": [
+              {
+                "field": "airco_against_existing_party_wall",
+                "equals": "nee"
+              },
+              {
+                "field": "airco_distance_boundary",
+                "lessThan": 2
+              }
+            ],
+            "reason": "Het onderdeel staat op minder dan 2 meter van de perceelsgrens en niet tegen een bestaande scheidingsmuur."
+          }
+        ]
+      }
+    },
+    {
+      "id": "woning_oprit",
+      "chapter": "H2",
+      "title": "Ik wil een strikt noodzakelijke toegang of oprit aanleggen bij een woning",
+      "article": "Art. 2.1, 9° en 2.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
           "type": "select",
           "options": [
             "onbekend",
@@ -736,7 +1989,7 @@
         },
         {
           "id": "strict_access",
-          "label": "Is dit de strikt noodzakelijke toegang of oprit naar het gebouw?",
+          "label": "Is de toegang of oprit strikt noodzakelijk om het gebouw te bereiken?",
           "type": "select",
           "options": [
             "onbekend",
@@ -746,7 +1999,7 @@
         },
         {
           "id": "rain_own",
-          "label": "Blijft hemelwater op eigen terrein?",
+          "label": "Blijft het hemelwater op eigen terrein?",
           "type": "select",
           "options": [
             "onbekend",
@@ -755,8 +2008,8 @@
           ]
         },
         {
-          "id": "ditch_involved",
-          "label": "Wordt een baangracht overwelfd of ingebuisd?",
+          "id": "includes_ditch",
+          "label": "Omvat de handeling een overwelving of inbuizing van een gracht of waterloop?",
           "type": "select",
           "options": [
             "onbekend",
@@ -766,18 +2019,40 @@
         }
       ],
       "abr": [
-        "drivewayGent",
-        "pavingGent",
-        "ditchGent"
+        "pavingGent"
       ],
-      "passText": "Vrijstelling mogelijk voor de strikt noodzakelijke toegang/oprit met hemelwater op eigen terrein. Baangracht apart toetsen."
+      "passText": "Vrijstelling mogelijk voor de strikt noodzakelijke toegang of oprit in de voortuin, met hemelwater op eigen terrein. Een baangracht wordt afzonderlijk getoetst.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "strict_access",
+            "equals": "nee",
+            "reason": "De toegang of oprit is niet beperkt tot het strikt noodzakelijke."
+          },
+          {
+            "field": "includes_ditch",
+            "equals": "ja",
+            "reason": "Overwelving of inbuizing valt niet onder deze route, behalve de afzonderlijke baangrachtvrijstelling."
+          }
+        ]
+      }
     },
     {
-      "id": "woning_bijgebouw",
+      "id": "woning_tuinconstructie",
       "chapter": "H2",
-      "title": "Ik wil een vrijstaand bijgebouw of carport plaatsen bij een woning",
-      "article": "Art. 2.1, 11° en 2.2",
+      "title": "Ik wil een kleine tuinconstructie plaatsen bij een woning",
+      "article": "Art. 2.1, 10°",
       "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
       "questions": [
         {
           "id": "legal",
@@ -788,6 +2063,111 @@
             "ja",
             "nee"
           ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "small_garden_type",
+          "label": "Welke kleine tuinconstructie wordt geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "tuinornament",
+            "brievenbus",
+            "barbecue",
+            "speeltoestel",
+            "andere kleine tuinconstructie"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor gebruikelijke kleine tuinconstructies."
+    },
+    {
+      "id": "woning_bijgebouw",
+      "chapter": "H2",
+      "title": "Ik wil een vrijstaand bijgebouw of carport plaatsen bij een woning",
+      "article": "Art. 2.1, 11° en 2.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "vulnerable_area_type",
+          "label": "Welke planologische context geldt op de plaats van de handeling?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "geen ruimtelijk kwetsbaar gebied",
+            "parkgebied",
+            "ander ruimtelijk kwetsbaar gebied"
+          ],
+          "helpText": "Voor deze handeling is een ander ruimtelijk kwetsbaar gebied dan parkgebied uitgesloten."
         },
         {
           "id": "not_stay",
@@ -800,11 +2180,12 @@
           ]
         },
         {
-          "id": "side_or_back",
-          "label": "Komt het in zijtuin of achtertuin?",
+          "id": "outbuilding_location",
+          "label": "Waar wordt het geplaatst?",
           "type": "select",
           "options": [
             "onbekend",
+            "voortuin",
             "zijtuin",
             "achtertuin"
           ]
@@ -817,19 +2198,55 @@
         },
         {
           "id": "height",
-          "label": "Wat is de hoogte?",
+          "label": "Maximale hoogte",
           "type": "number",
           "unit": "m"
+        },
+        {
+          "id": "outbuilding_against_wall",
+          "label": "Wordt het in de achtertuin tegen een bestaande scheidingsmuur op of tegen de perceelsgrens geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "showWhen": {
+            "outbuilding_location": "achtertuin"
+          }
+        },
+        {
+          "id": "existing_wall_unchanged",
+          "label": "Blijft de bestaande scheidingsmuur ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "showWhen": {
+            "outbuilding_against_wall": "ja"
+          }
         },
         {
           "id": "distance_boundary",
-          "label": "Afstand tot perceelsgrens of tegen bestaande scheidingsmuur",
+          "label": "Wat is de kortste afstand tot de perceelsgrens?",
           "type": "number",
-          "unit": "m"
+          "unit": "m",
+          "showWhenAny": [
+            {
+              "field": "outbuilding_location",
+              "equals": "zijtuin"
+            },
+            {
+              "field": "outbuilding_against_wall",
+              "equals": "nee"
+            }
+          ]
         },
         {
           "id": "rain_own",
-          "label": "Blijft hemelwater op eigen terrein?",
+          "label": "Blijft het hemelwater op eigen terrein?",
           "type": "select",
           "options": [
             "onbekend",
@@ -838,17 +2255,96 @@
           ]
         }
       ],
-      "abr": [
-        "greenRoofGent"
-      ],
-      "passText": "Vrijstelling mogelijk tot samen 40 m² en maximaal 3,5 m hoog, met afstandsregels en hemelwater op eigen terrein."
+      "abr": [],
+      "passText": "Vrijstelling mogelijk tot 40 m² en 3,5 meter hoog, in de zijtuin op minstens 3 meter en in de achtertuin op minstens 1 meter of tegen een bestaande ongewijzigde scheidingsmuur.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "not_stay",
+            "equals": "nee",
+            "reason": "Het bijgebouw is bestemd voor verblijf."
+          },
+          {
+            "field": "outbuilding_location",
+            "equals": "voortuin",
+            "reason": "Een vrijstaand bijgebouw of carport in de voortuin valt niet onder deze vrijstelling."
+          },
+          {
+            "field": "area_total",
+            "greaterThan": 40,
+            "reason": "De totale oppervlakte overschrijdt 40 m²."
+          },
+          {
+            "field": "height",
+            "greaterThan": 3.5,
+            "reason": "De hoogte overschrijdt 3,5 meter."
+          },
+          {
+            "all": [
+              {
+                "field": "outbuilding_location",
+                "equals": "zijtuin"
+              },
+              {
+                "field": "distance_boundary",
+                "lessThan": 3
+              }
+            ],
+            "reason": "In de zijtuin is minder dan 3 meter afstand tot de perceelsgrens."
+          },
+          {
+            "all": [
+              {
+                "field": "outbuilding_location",
+                "equals": "achtertuin"
+              },
+              {
+                "field": "outbuilding_against_wall",
+                "equals": "nee"
+              },
+              {
+                "field": "distance_boundary",
+                "lessThan": 1
+              }
+            ],
+            "reason": "In de achtertuin is minder dan 1 meter afstand en wordt niet tegen een bestaande scheidingsmuur gebouwd."
+          },
+          {
+            "all": [
+              {
+                "field": "outbuilding_against_wall",
+                "equals": "ja"
+              },
+              {
+                "field": "existing_wall_unchanged",
+                "equals": "nee"
+              }
+            ],
+            "reason": "De bestaande scheidingsmuur wordt gewijzigd."
+          },
+          {
+            "field": "vulnerable_area_type",
+            "equals": "ander ruimtelijk kwetsbaar gebied",
+            "reason": "Deze handeling is uitgesloten in ruimtelijk kwetsbaar gebied, behalve parkgebied."
+          }
+        ]
+      }
     },
     {
       "id": "woning_opslag",
       "chapter": "H2",
-      "title": "Ik wil materiaal opslaan bij een woning",
+      "title": "Ik wil materiaal of materieel opslaan bij een woning",
       "article": "Art. 2.1, 12° en 2.2",
       "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte"
+        ]
+      },
       "questions": [
         {
           "id": "legal",
@@ -861,8 +2357,50 @@
           ]
         },
         {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "vulnerable_area_type",
+          "label": "Welke planologische context geldt op de plaats van de handeling?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "geen ruimtelijk kwetsbaar gebied",
+            "parkgebied",
+            "ander ruimtelijk kwetsbaar gebied"
+          ],
+          "helpText": "Voor deze handeling is een ander ruimtelijk kwetsbaar gebied dan parkgebied uitgesloten."
+        },
+        {
           "id": "volume",
-          "label": "Volume opslag",
+          "label": "Totaal opslagvolume",
           "type": "number",
           "unit": "m³"
         },
@@ -878,7 +2416,26 @@
         }
       ],
       "abr": [],
-      "passText": "Vrijstelling mogelijk tot 10 m³ voor bij de woning horende materialen, uit het zicht van de openbare weg."
+      "passText": "Vrijstelling mogelijk voor bij de woning horende materialen en materieel tot 10 m³, niet zichtbaar vanaf de openbare weg en buiten uitgesloten kwetsbaar gebied.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "volume",
+            "greaterThan": 10,
+            "reason": "Het opslagvolume overschrijdt 10 m³."
+          },
+          {
+            "field": "visible_road",
+            "equals": "ja",
+            "reason": "De opslag is zichtbaar vanaf de openbare weg."
+          },
+          {
+            "field": "vulnerable_area_type",
+            "equals": "ander ruimtelijk kwetsbaar gebied",
+            "reason": "Deze handeling is uitgesloten in ruimtelijk kwetsbaar gebied, behalve parkgebied."
+          }
+        ]
+      }
     },
     {
       "id": "woning_verplaatsbaar",
@@ -886,6 +2443,15 @@
       "title": "Ik wil één verplaatsbare inrichting plaatsen bij een woning",
       "article": "Art. 2.1, 13° en 2.2",
       "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte"
+        ]
+      },
       "questions": [
         {
           "id": "legal",
@@ -896,6 +2462,48 @@
             "ja",
             "nee"
           ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "vulnerable_area_type",
+          "label": "Welke planologische context geldt op de plaats van de handeling?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "geen ruimtelijk kwetsbaar gebied",
+            "parkgebied",
+            "ander ruimtelijk kwetsbaar gebied"
+          ],
+          "helpText": "Voor deze handeling is een ander ruimtelijk kwetsbaar gebied dan parkgebied uitgesloten."
         },
         {
           "id": "one_unit",
@@ -909,7 +2517,7 @@
         },
         {
           "id": "actual_living",
-          "label": "Wordt er effectief gewoond?",
+          "label": "Wordt in de inrichting gewoond?",
           "type": "select",
           "options": [
             "onbekend",
@@ -929,18 +2537,82 @@
         }
       ],
       "abr": [],
-      "passText": "Vrijstelling mogelijk voor één verplaatsbare inrichting zonder effectieve bewoning en niet zichtbaar vanaf de openbare weg."
+      "passText": "Vrijstelling mogelijk voor één inrichting, zonder bewoning, niet zichtbaar vanaf de openbare weg en buiten uitgesloten kwetsbaar gebied.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "one_unit",
+            "equals": "nee",
+            "reason": "Er wordt meer dan één verplaatsbare inrichting geplaatst."
+          },
+          {
+            "field": "actual_living",
+            "equals": "ja",
+            "reason": "In de inrichting wordt gewoond."
+          },
+          {
+            "field": "visible_road",
+            "equals": "ja",
+            "reason": "De inrichting is zichtbaar vanaf de openbare weg."
+          },
+          {
+            "field": "vulnerable_area_type",
+            "equals": "ander ruimtelijk kwetsbaar gebied",
+            "reason": "Deze handeling is uitgesloten in ruimtelijk kwetsbaar gebied, behalve parkgebied."
+          }
+        ]
+      }
     },
     {
       "id": "woning_techniek",
       "chapter": "H2",
-      "title": "Ik wil een technische constructie plaatsen op of aan een woning",
-      "article": "Art. 2.1, 14°",
+      "title": "Ik wil een gebruikelijke technische constructie plaatsen op of aan een woning",
+      "article": "Art. 2.1, 14° en 2.2",
       "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
       "questions": [
         {
           "id": "legal",
           "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
           "type": "select",
           "options": [
             "onbekend",
@@ -953,95 +2625,55 @@
           "label": "Hoeveel meter steekt de constructie boven de nok uit?",
           "type": "number",
           "unit": "m"
+        },
+        {
+          "id": "excluded_technical_type",
+          "label": "Gaat het om zonnepanelen, een zonneboiler of een bovengronds onderdeel van een warmtepomp of airco?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
         }
       ],
       "abr": [],
-      "passText": "Vrijstelling mogelijk voor gebruikelijke technische constructies tot 3 m boven de nok."
+      "passText": "Vrijstelling mogelijk voor een gebruikelijke technische constructie tot 3 meter boven de nok, behalve voor de uitdrukkelijk uitgesloten installaties.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "above_ridge",
+            "greaterThan": 3,
+            "reason": "De constructie steekt meer dan 3 meter boven de nok uit."
+          },
+          {
+            "field": "excluded_technical_type",
+            "equals": "ja",
+            "reason": "Deze installatie moet via de specifieke zonnepanelen- of warmtepomproute worden beoordeeld."
+          }
+        ]
+      }
     },
     {
-      "id": "woning_laad_afval",
+      "id": "woning_laadpaal",
       "chapter": "H2",
-      "title": "Ik wil een laadpaal of afvalhouder plaatsen bij een woning",
-      "article": "Art. 2.1, 15°-16°",
+      "title": "Ik wil een elektrische laadpaal plaatsen bij een woning",
+      "article": "Art. 2.1, 15° en 2.2",
       "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
       "questions": [
         {
           "id": "legal",
           "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        },
-        {
-          "id": "object_type",
-          "label": "Wat plaats je?",
-          "type": "select",
-          "options": [
-            "laadpaal",
-            "glasbol/kledingcontainer/afvalhouder"
-          ]
-        },
-        {
-          "id": "area_total",
-          "label": "Gezamenlijke oppervlakte afvalhouders",
-          "type": "number",
-          "unit": "m²"
-        }
-      ],
-      "abr": [],
-      "passText": "Vrijstelling mogelijk voor elektrische laadpalen en afvalhouders kleiner dan 10 m²."
-    },
-    {
-      "id": "andere_gebouwen",
-      "chapter": "H3",
-      "title": "Ik wil werken uitvoeren bij een ander gebouw dan een woning",
-      "article": "Art. 3.1-3.2",
-      "tags": [],
-      "questions": [
-        {
-          "id": "legal",
-          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        },
-        {
-          "id": "building_not_house",
-          "label": "Gaat het om een gebouw dat geen woning is?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        },
-        {
-          "id": "action_other_building",
-          "label": "Welke handeling?",
-          "type": "select",
-          "options": [
-            "gevel/dak",
-            "buitenisolatie",
-            "zonnepanelen/zonneboiler",
-            "binnenverbouwing",
-            "afsluiting/poort",
-            "oprit",
-            "seizoensgebonden horecaterras",
-            "technische constructie",
-            "afvalopslag",
-            "afvalhouder",
-            "laadpaal"
-          ]
-        },
-        {
-          "id": "within_30m",
-          "label": "Ligt de handeling binnen 30 m wanneer artikel 3.2 dat vraagt?",
           "type": "select",
           "options": [
             "onbekend",
@@ -1051,7 +2683,7 @@
         },
         {
           "id": "function_change",
-          "label": "Wijzigt de vergunningsplichtige functie?",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
           "type": "select",
           "options": [
             "onbekend",
@@ -1060,8 +2692,1009 @@
           ]
         },
         {
-          "id": "heritage_visible",
-          "label": "Gaat het om inventaris- of UNESCO-context bij zichtbare gevel/dak/zon op gevel?",
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor de plaatsing van een elektrische laadpaal."
+    },
+    {
+      "id": "woning_afvalhouder",
+      "chapter": "H2",
+      "title": "Ik wil een afvalhouder plaatsen bij een woning",
+      "article": "Art. 2.1, 16° en 2.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "housing_units",
+          "label": "Blijft het aantal woongelegenheden ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "waste_holder_type",
+          "label": "Welke afvalhouder wordt geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "glasbol",
+            "kledingcontainer",
+            "andere houder voor selectieve inzameling"
+          ]
+        },
+        {
+          "id": "area_total",
+          "label": "Gezamenlijke oppervlakte",
+          "type": "number",
+          "unit": "m²"
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor houders voor selectieve inzameling met een gezamenlijke oppervlakte kleiner dan 10 m².",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "area_total",
+            "greaterThanOrEqual": 10,
+            "reason": "De gezamenlijke oppervlakte bedraagt 10 m² of meer."
+          }
+        ]
+      }
+    },
+    {
+      "id": "andere_ondergronds",
+      "chapter": "H3",
+      "title": "Ik wil een gebruikelijke ondergrondse constructie plaatsen bij een ander gebouw",
+      "article": "Art. 3.1, 1° en 3.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het niet-woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw of gebouwdeel dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "underground_plan_conflict",
+          "label": "Is de constructie strijdig met een goedgekeurd rooilijnplan, een daarin opgenomen achteruitbouwstrook of een goedgekeurd onteigeningsplan?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor een gebruikelijke ondergrondse constructie die niet strijdig is met de vermelde plannen.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "underground_plan_conflict",
+            "equals": "ja",
+            "reason": "De ondergrondse constructie is strijdig met een goedgekeurd plan."
+          }
+        ]
+      }
+    },
+    {
+      "id": "andere_gevel_dak",
+      "chapter": "H3",
+      "title": "Ik wil gevel- of dakwerken uitvoeren aan een ander gebouw",
+      "article": "Art. 3.1, 2° en 3.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het niet-woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw of gebouwdeel dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "same_volume",
+          "label": "Blijft het fysieke bouwvolume ongewijzigd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "energy",
+          "label": "Wordt de energieprestatie na de werken slechter?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "heritage_context",
+          "label": "Welke erfgoedcontext geldt voor het gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "geen van deze",
+            "werelderfgoed of UNESCO-bufferzone",
+            "vastgestelde inventaris bouwkundig erfgoed, niet beschermd",
+            "beschermd onroerend erfgoed"
+          ],
+          "helpText": "Werelderfgoed of UNESCO-bufferzone en een vastgesteld inventarispand dat niet beschermd is, sluiten deze specifieke vrijstellingsroute uit. Voor beschermd erfgoed geldt een afzonderlijk toelatingsstelsel."
+        }
+      ],
+      "abr": [
+        "facadeStreetGent"
+      ],
+      "passText": "Vrijstelling mogelijk zonder wijziging van het fysieke bouwvolume, zonder verslechtering van de energieprestatie en buiten de uitgesloten erfgoedcontexten.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "same_volume",
+            "equals": "nee",
+            "reason": "Het fysieke bouwvolume wijzigt."
+          },
+          {
+            "field": "energy",
+            "equals": "ja",
+            "reason": "De energieprestatie wordt slechter."
+          },
+          {
+            "field": "heritage_context",
+            "in": [
+              "werelderfgoed of UNESCO-bufferzone",
+              "vastgestelde inventaris bouwkundig erfgoed, niet beschermd"
+            ],
+            "reason": "Deze handeling valt in deze erfgoedcontext niet onder de vrijstellingsroute."
+          }
+        ],
+        "researchConditions": [
+          {
+            "field": "heritage_context",
+            "in": [
+              "beschermd onroerend erfgoed"
+            ],
+            "reason": "Voor beschermd onroerend erfgoed moet het afzonderlijke toelatingsstelsel worden gecontroleerd."
+          }
+        ]
+      }
+    },
+    {
+      "id": "andere_isolatie",
+      "chapter": "H3",
+      "title": "Ik wil buitenisolatie plaatsen aan een ander gebouw",
+      "article": "Art. 3.1, 2/1° en 3.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het niet-woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw of gebouwdeel dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "insulation_cm",
+          "label": "Hoe dik is de isolatie inclusief gebruikelijke afwerking?",
+          "type": "number",
+          "unit": "cm"
+        },
+        {
+          "id": "insulation_parts",
+          "label": "Waar wordt de buitenisolatie aangebracht?",
+          "type": "multiselect",
+          "options": [
+            "voorgevel",
+            "zijgevel",
+            "achtergevel",
+            "buitenzijde van het dak"
+          ]
+        },
+        {
+          "id": "insulation_crosses_building_line",
+          "label": "Wordt door de isolatie of afwerking een rooilijn overschreden?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee",
+            "niet van toepassing"
+          ],
+          "helpText": "Elke overschrijding van een rooilijn sluit deze vrijstellingsroute uit."
+        },
+        {
+          "id": "heritage_context",
+          "label": "Welke erfgoedcontext geldt voor het gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "geen van deze",
+            "werelderfgoed of UNESCO-bufferzone",
+            "vastgestelde inventaris bouwkundig erfgoed, niet beschermd",
+            "beschermd onroerend erfgoed"
+          ],
+          "helpText": "Werelderfgoed of UNESCO-bufferzone en een vastgesteld inventarispand dat niet beschermd is, sluiten deze specifieke vrijstellingsroute uit. Voor beschermd erfgoed geldt een afzonderlijk toelatingsstelsel."
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor buitenisolatie inclusief gebruikelijke afwerking tot 26 cm, zonder overschrijding van een rooilijn en buiten de uitgesloten erfgoedcontexten.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "insulation_cm",
+            "greaterThan": 26,
+            "reason": "De isolatie inclusief afwerking is dikker dan 26 cm."
+          },
+          {
+            "field": "insulation_crosses_building_line",
+            "equals": "ja",
+            "reason": "De isolatie of afwerking overschrijdt een rooilijn."
+          },
+          {
+            "field": "heritage_context",
+            "in": [
+              "werelderfgoed of UNESCO-bufferzone",
+              "vastgestelde inventaris bouwkundig erfgoed, niet beschermd"
+            ],
+            "reason": "Deze handeling valt in deze erfgoedcontext niet onder de vrijstellingsroute."
+          }
+        ],
+        "researchConditions": [
+          {
+            "field": "heritage_context",
+            "in": [
+              "beschermd onroerend erfgoed"
+            ],
+            "reason": "Voor beschermd onroerend erfgoed moet het afzonderlijke toelatingsstelsel worden gecontroleerd."
+          }
+        ]
+      }
+    },
+    {
+      "id": "andere_zonnepanelen",
+      "chapter": "H3",
+      "title": "Ik wil zonnepanelen of een zonneboiler plaatsen bij een ander gebouw",
+      "article": "Art. 3.1, 3° en 3.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het niet-woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw of gebouwdeel dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "placementType",
+          "label": "Waar worden de zonnepanelen of de zonneboiler geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "op een plat dak",
+            "in of op een hellend dakvlak",
+            "op een gevel",
+            "aan een balkonafsluiting",
+            "op een andere plaats"
+          ]
+        },
+        {
+          "id": "heightAboveRoofEdgeM",
+          "label": "Hoeveel meter komt de installatie boven de dakrand uit?",
+          "type": "number",
+          "unit": "m",
+          "showWhen": {
+            "placementType": "op een plat dak"
+          }
+        },
+        {
+          "id": "facadeAreaM2",
+          "label": "Wat is de totale oppervlakte van de installatie op deze gevel?",
+          "type": "number",
+          "unit": "m² per gevel",
+          "showWhen": {
+            "placementType": "op een gevel"
+          }
+        },
+        {
+          "id": "heritage_context",
+          "label": "Welke erfgoedcontext geldt voor het gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "geen van deze",
+            "werelderfgoed of UNESCO-bufferzone",
+            "vastgestelde inventaris bouwkundig erfgoed, niet beschermd",
+            "beschermd onroerend erfgoed"
+          ],
+          "helpText": "Werelderfgoed of UNESCO-bufferzone en een vastgesteld inventarispand dat niet beschermd is, sluiten deze specifieke vrijstellingsroute uit. Voor beschermd erfgoed geldt een afzonderlijk toelatingsstelsel.",
+          "showWhen": {
+            "placementType": [
+              "op een gevel",
+              "aan een balkonafsluiting"
+            ]
+          }
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk bij een toegelaten plaatsingsvorm en, bij gevel of balkonafsluiting, buiten de uitgesloten erfgoedcontexten.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "placementType",
+            "equals": "op een andere plaats",
+            "reason": "De gekozen plaatsingswijze is niet opgenomen."
+          },
+          {
+            "all": [
+              {
+                "field": "placementType",
+                "equals": "op een plat dak"
+              },
+              {
+                "field": "heightAboveRoofEdgeM",
+                "greaterThan": 1
+              }
+            ],
+            "reason": "De installatie komt meer dan 1 meter boven de dakrand uit."
+          },
+          {
+            "all": [
+              {
+                "field": "placementType",
+                "equals": "op een gevel"
+              },
+              {
+                "field": "facadeAreaM2",
+                "greaterThan": 4
+              }
+            ],
+            "reason": "De installatie is groter dan 4 m² op deze gevel."
+          },
+          {
+            "field": "heritage_context",
+            "in": [
+              "werelderfgoed of UNESCO-bufferzone",
+              "vastgestelde inventaris bouwkundig erfgoed, niet beschermd"
+            ],
+            "reason": "Deze handeling valt in deze erfgoedcontext niet onder de vrijstellingsroute."
+          }
+        ],
+        "researchConditions": [
+          {
+            "field": "heritage_context",
+            "in": [
+              "beschermd onroerend erfgoed"
+            ],
+            "reason": "Voor beschermd onroerend erfgoed moet het afzonderlijke toelatingsstelsel worden gecontroleerd."
+          }
+        ]
+      }
+    },
+    {
+      "id": "andere_binnen",
+      "chapter": "H3",
+      "title": "Ik wil binnen verbouwen in een ander gebouw",
+      "article": "Art. 3.1, 4° en 3.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het niet-woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw of gebouwdeel dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor binnenverbouwingen zonder vergunningsplichtige functiewijziging."
+    },
+    {
+      "id": "andere_afsluiting",
+      "chapter": "H3",
+      "title": "Ik wil een afsluiting of poort plaatsen bij een ander gebouw",
+      "article": "Art. 3.1, 5°-7°/1 en 3.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het niet-woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw of gebouwdeel dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "fence_type",
+          "label": "Wat wordt geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "afsluiting",
+            "toegangspoort"
+          ]
+        },
+        {
+          "id": "fence_location",
+          "label": "Waar wordt de afsluiting of poort geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "voortuin",
+            "zijtuin",
+            "achtertuin",
+            "meerdere tuinzones"
+          ]
+        },
+        {
+          "id": "fence_openness",
+          "label": "Open of gesloten?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "open",
+            "gesloten"
+          ]
+        },
+        {
+          "id": "fence_height",
+          "label": "Hoogte",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ],
+          "showWhenAll": [
+            {
+              "field": "fence_type",
+              "equals": "afsluiting"
+            },
+            {
+              "field": "fence_openness",
+              "equals": "gesloten"
+            },
+            {
+              "field": "fence_location",
+              "in": [
+                "zijtuin",
+                "achtertuin"
+              ]
+            }
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk binnen de toepasselijke hoogtevoorwaarden; in afgebakend zeehavengebied zijn open afsluitingen en toegangspoorten tot 3 meter mogelijk.",
+      "rules": {
+        "heightRules": [
+          {
+            "when": {
+              "fence_location": "voortuin",
+              "fence_openness": "gesloten"
+            },
+            "maxHeightM": 1
+          },
+          {
+            "when": {
+              "fence_openness": "open"
+            },
+            "maxHeightM": 2
+          },
+          {
+            "when": {
+              "fence_location": [
+                "zijtuin",
+                "achtertuin"
+              ],
+              "fence_openness": "gesloten"
+            },
+            "maxHeightM": 2
+          }
+        ],
+        "seaportOpenMaxHeightM": 3
+      }
+    },
+    {
+      "id": "andere_airco",
+      "chapter": "H3",
+      "title": "Ik wil een warmtepomp of airco plaatsen bij een ander gebouw",
+      "article": "Art. 3.1, 7°/2 en 3.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het niet-woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw of gebouwdeel dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "airco_place",
+          "label": "Waar wordt het bovengrondse onderdeel geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "tuin",
+            "gevel",
+            "plat dak",
+            "andere plaats"
+          ]
+        },
+        {
+          "id": "airco_against_existing_party_wall",
+          "label": "Wordt het onderdeel tegen een bestaande scheidingsmuur geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "airco_distance_boundary",
+          "label": "Kortste afstand tot de perceelsgrens",
+          "type": "number",
+          "unit": "m",
+          "showWhen": {
+            "airco_against_existing_party_wall": "nee"
+          }
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk in de tuin, op een gevel of op een plat dak, tegen een bestaande scheidingsmuur of op minstens 2 meter van de perceelsgrens.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "airco_place",
+            "equals": "andere plaats",
+            "reason": "De gekozen plaats ligt niet in deze vrijstellingsroute."
+          },
+          {
+            "all": [
+              {
+                "field": "airco_against_existing_party_wall",
+                "equals": "nee"
+              },
+              {
+                "field": "airco_distance_boundary",
+                "lessThan": 2
+              }
+            ],
+            "reason": "Het onderdeel staat op minder dan 2 meter van de perceelsgrens en niet tegen een bestaande scheidingsmuur."
+          }
+        ]
+      }
+    },
+    {
+      "id": "andere_oprit",
+      "chapter": "H3",
+      "title": "Ik wil een strikt noodzakelijke toegang of oprit aanleggen bij een ander gebouw",
+      "article": "Art. 3.1, 8° en 3.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het niet-woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw of gebouwdeel dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "strict_access",
+          "label": "Is de toegang of oprit strikt noodzakelijk?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "rain_own",
+          "label": "Blijft het hemelwater op eigen terrein?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "includes_ditch",
+          "label": "Omvat de handeling een overwelving of inbuizing van een gracht of waterloop?",
           "type": "select",
           "options": [
             "onbekend",
@@ -1071,12 +3704,532 @@
         }
       ],
       "abr": [
-        "drivewayGent",
-        "pavingGent",
-        "greenRoofGent",
+        "pavingGent"
+      ],
+      "passText": "Vrijstelling mogelijk voor de strikt noodzakelijke toegang of oprit, met hemelwater op eigen terrein. Een baangracht wordt afzonderlijk getoetst.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "strict_access",
+            "equals": "nee",
+            "reason": "De toegang of oprit is niet strikt noodzakelijk."
+          },
+          {
+            "field": "includes_ditch",
+            "equals": "ja",
+            "reason": "Overwelving of inbuizing valt niet onder deze route, behalve de baangrachtvrijstelling."
+          }
+        ]
+      }
+    },
+    {
+      "id": "andere_horecaterras",
+      "chapter": "H3",
+      "title": "Ik wil een seizoensgebonden niet-overdekt horecaterras plaatsen",
+      "article": "Art. 3.1, 9° en 3.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het niet-woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw of gebouwdeel dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "horeca_existing",
+          "label": "Hoort het terras bij een bestaande hoofdzakelijk vergunde of vergund geachte horecazaak?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "terrace_uncovered",
+          "label": "Blijft het terras niet-overdekt?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "terrace_seasonal",
+          "label": "Is het terras seizoensgebonden?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [
         "horecaGent"
       ],
-      "passText": "Vrijstelling mogelijk voor de opgesomde handelingen bij hoofdzakelijk vergunde andere gebouwen, met 30 m-, functie- en erfgoedfilter."
+      "passText": "Vrijstelling mogelijk voor een seizoensgebonden, niet-overdekt terras bij een bestaande horecazaak.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "horeca_existing",
+            "equals": "nee",
+            "reason": "Het terras hoort niet bij een bestaande vergunde horecazaak."
+          },
+          {
+            "field": "terrace_uncovered",
+            "equals": "nee",
+            "reason": "Het terras is overdekt."
+          },
+          {
+            "field": "terrace_seasonal",
+            "equals": "nee",
+            "reason": "Het terras is niet seizoensgebonden."
+          }
+        ]
+      }
+    },
+    {
+      "id": "andere_techniek",
+      "chapter": "H3",
+      "title": "Ik wil een gebruikelijke technische constructie plaatsen op of aan een ander gebouw",
+      "article": "Art. 3.1, 10° en 3.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het niet-woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw of gebouwdeel dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "above_ridge",
+          "label": "Hoeveel meter steekt de constructie boven de nok uit?",
+          "type": "number",
+          "unit": "m"
+        },
+        {
+          "id": "excluded_technical_type",
+          "label": "Gaat het om zonnepanelen, een zonneboiler of een bovengronds onderdeel van een warmtepomp of airco?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk tot 3 meter boven de nok, behalve voor de uitdrukkelijk uitgesloten installaties.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "above_ridge",
+            "greaterThan": 3,
+            "reason": "De constructie steekt meer dan 3 meter boven de nok uit."
+          },
+          {
+            "field": "excluded_technical_type",
+            "equals": "ja",
+            "reason": "Gebruik de specifieke zonnepanelen- of warmtepomproute."
+          }
+        ]
+      }
+    },
+    {
+      "id": "andere_tuinconstructie",
+      "chapter": "H3",
+      "title": "Ik wil een kleine tuinconstructie plaatsen bij een ander gebouw",
+      "article": "Art. 3.1, 11° en 3.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het niet-woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw of gebouwdeel dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "small_garden_type",
+          "label": "Welke kleine tuinconstructie wordt geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "tuinornament",
+            "brievenbus",
+            "barbecue",
+            "andere kleine tuinconstructie"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor gebruikelijke kleine tuinconstructies."
+    },
+    {
+      "id": "andere_afvalopslag",
+      "chapter": "H3",
+      "title": "Ik wil afvalstoffen voorlopig opslaan op de plaats van productie",
+      "article": "Art. 3.1, 12° en 3.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het niet-woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw of gebouwdeel dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "waste_at_production_place",
+          "label": "Gebeurt de opslag op de plaats waar de afvalstoffen worden geproduceerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "regular_organized_collection",
+          "label": "Gebeurt de opslag in functie van een georganiseerde regelmatige afvoer?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor voorlopige opslag op de plaats van productie in functie van een georganiseerde regelmatige afvoer.",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "waste_at_production_place",
+            "equals": "nee",
+            "reason": "De opslag gebeurt niet op de plaats van productie."
+          },
+          {
+            "field": "regular_organized_collection",
+            "equals": "nee",
+            "reason": "Er is geen georganiseerde regelmatige afvoer."
+          }
+        ]
+      }
+    },
+    {
+      "id": "andere_afvalhouder",
+      "chapter": "H3",
+      "title": "Ik wil een afvalhouder plaatsen bij een ander gebouw",
+      "article": "Art. 3.1, 13° en 3.2",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het niet-woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw of gebouwdeel dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "within_30m",
+          "label": "Wordt de volledige handeling uitgevoerd binnen een straal van 30 meter van de betrokken hoofdzakelijk vergunde of vergund geachte woning of het betrokken gebouw?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "waste_holder_type",
+          "label": "Welke afvalhouder wordt geplaatst?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "glasbol",
+            "kledingcontainer",
+            "andere houder voor selectieve inzameling"
+          ]
+        },
+        {
+          "id": "area_total",
+          "label": "Gezamenlijke oppervlakte",
+          "type": "number",
+          "unit": "m²"
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor houders voor selectieve inzameling met een gezamenlijke oppervlakte kleiner dan 20 m².",
+      "rules": {
+        "notConditions": [
+          {
+            "field": "area_total",
+            "greaterThanOrEqual": 20,
+            "reason": "De gezamenlijke oppervlakte bedraagt 20 m² of meer."
+          }
+        ]
+      }
+    },
+    {
+      "id": "andere_laadpaal",
+      "chapter": "H3",
+      "title": "Ik wil een elektrische laadpaal plaatsen bij een ander gebouw",
+      "article": "Art. 3.1, 14°",
+      "tags": [],
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie"
+        ],
+        "mixed_building_part": [
+          "uitsluitend het niet-woongedeelte",
+          "gemeenschappelijke delen of de volledige gebouwschil"
+        ]
+      },
+      "questions": [
+        {
+          "id": "legal",
+          "label": "Gaat het om een hoofdzakelijk vergunde of vergund geachte bestaande toestand?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "function_change",
+          "label": "Wordt door deze handeling een vergunningsplichtige functiewijziging doorgevoerd?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        },
+        {
+          "id": "building_not_house",
+          "label": "Gaat het om een gebouw of gebouwdeel dat geen woning is?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
+        }
+      ],
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor de plaatsing van een elektrische laadpaal."
     },
     {
       "id": "industrie_constructie",
@@ -1154,10 +4307,43 @@
           "unit": "m"
         },
         {
-          "id": "distance_residential",
-          "label": "Afstand tot woongebied of kwetsbaar gebied",
+          "id": "distance_residential_area",
+          "label": "Wat is de kortste afstand tot woongebied in ruime zin?",
           "type": "number",
-          "unit": "m"
+          "unit": "m",
+          "showWhen": {
+            "industry_action": [
+              "constructie zonder gebouw/verharding",
+              "verharding"
+            ]
+          }
+        },
+        {
+          "id": "nearby_vulnerable_area_type",
+          "label": "Welk type ruimtelijk kwetsbaar gebied ligt het dichtst bij de voorgenomen handeling?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "geen ruimtelijk kwetsbaar gebied in de omgeving",
+            "parkgebied",
+            "ander ruimtelijk kwetsbaar gebied"
+          ],
+          "helpText": "Kies parkgebied afzonderlijk. De afstandsvoorwaarde geldt hier voor ruimtelijk kwetsbaar gebied dat geen parkgebied is.",
+          "showWhen": {
+            "industry_action": [
+              "constructie zonder gebouw/verharding",
+              "verharding"
+            ]
+          }
+        },
+        {
+          "id": "distance_vulnerable_area",
+          "label": "Wat is de kortste afstand tot het ruimtelijk kwetsbare gebied dat geen parkgebied is?",
+          "type": "number",
+          "unit": "m",
+          "showWhen": {
+            "nearby_vulnerable_area_type": "ander ruimtelijk kwetsbaar gebied"
+          }
         },
         {
           "id": "distance_boundary",
@@ -1197,10 +4383,14 @@
         }
       ],
       "abr": [
-        "pavingGent",
-        "greenRoofGent"
+        "pavingGent"
       ],
-      "passText": "Vrijstelling mogelijk binnen de maxima voor industriegebied/zeehavengebied, met afstands-, hulpdienst-, voorschriften- en hemelwatervoorwaarden."
+      "passText": "Vrijstelling mogelijk binnen de maxima voor industriegebied/zeehavengebied, met afstands-, hulpdienst-, voorschriften- en hemelwatervoorwaarden.",
+      "route": {
+        "project_context": [
+          "een terrein of constructie zonder hoofdgebouw"
+        ]
+      }
     },
     {
       "id": "landbouw",
@@ -1303,12 +4493,37 @@
           ]
         }
       ],
-      "abr": [
-        "drivewayGent",
-        "ditchGent",
-        "pavingGent"
-      ],
-      "passText": "Vrijstelling mogelijk voor de opgesomde landbouw- en tuinbouwhandelingen met strikte zone-, maat-, afstands- en watervoorwaarden."
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor de opgesomde landbouw- en tuinbouwhandelingen met strikte zone-, maat-, afstands- en watervoorwaarden.",
+      "route": {
+        "project_context": [
+          "land- of tuinbouw"
+        ]
+      },
+      "conditionalAbr": [
+        {
+          "when": {
+            "agri_action": "perceelsoprit"
+          },
+          "include": "drivewayGent"
+        },
+        {
+          "when": {
+            "agri_action": "perceelsoprit"
+          },
+          "include": "pavingGent"
+        },
+        {
+          "when": {
+            "agri_action": [
+              "drainage",
+              "peilgestuurde drainage",
+              "stuw/maatregel"
+            ]
+          },
+          "include": "ditchGent"
+        }
+      ]
     },
     {
       "id": "groen_boom",
@@ -1343,17 +4558,15 @@
             "open afsluiting"
           ]
         },
-        {  
-          "id": "tree_circumference_1m",
-          "label": "Wat is de stamomtrek van de boom op 1 meter hoogte?",
-          "type": "number",
-          "unit": "cm"
-        },
         {
-          "id": "tree_circumference_base",
-          "label": "Wat is de stamomtrek van de boom aan het maaiveld?",
-          "type": "number",
-          "unit": "cm"
+          "id": "high_tree",
+          "label": "Gaat het om een hoogstammige boom?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "ja",
+            "nee"
+          ]
         },
         {
           "id": "forest",
@@ -1403,11 +4616,31 @@
         }
       ],
       "abr": [
-        "treeGent",
-        "drivewayGent",
-        "ditchGent"
+        "treeGent"
       ],
-      "passText": "Vrijstelling mogelijk in de limitatieve gevallen van artikel 6.1-6.3. In Gent geldt een strengere boomcheck."
+      "passText": "Vrijstelling mogelijk in de limitatieve gevallen van artikel 6.1-6.3. In Gent geldt een strengere boomcheck.",
+      "route": {
+        "project_context": [
+          "groen, bomen of water"
+        ]
+      },
+      "conditionalAbr": [
+        {
+          "when": {
+            "green_action": "oprit/inbuizing in project"
+          },
+          "include": "drivewayGent"
+        },
+        {
+          "when": {
+            "green_action": [
+              "oprit/inbuizing in project",
+              "gracht aanleggen/openleggen/herprofileren/dempen"
+            ]
+          },
+          "include": "ditchGent"
+        }
+      ]
     },
     {
       "id": "tijdelijk",
@@ -1440,23 +4673,8 @@
           ]
         },
         {
-          "id": "previous_popup_same_good",
-          "label": "Was er dit kalenderjaar al een pop-up of tijdelijke functiewijziging op hetzelfde goed?",
-          "type": "select",
-          "options": [
-            "onbekend",
-            "ja",
-            "nee"
-          ]
-        },
-        {
-          "id": "previous_popup_periods_30",
-          "label": "Hoeveel periodes van 30 dagen zijn dit kalenderjaar al gebruikt op hetzelfde goed?",
-          "type": "number"
-        },
-        {
           "id": "periods_30",
-          "label": "Hoeveel nieuwe periodes van 30 dagen worden nu gevraagd?",
+          "label": "Aantal periodes van 30 aaneengesloten dagen per kalenderjaar",
           "type": "number"
         },
         {
@@ -1471,14 +4689,19 @@
           "unit": "m"
         },
         {
-          "id": "rk_area_ok",
-          "label": "Ligt de handeling buiten ruimtelijk kwetsbaar gebied behalve parkgebied?",
+          "id": "vulnerable_area_type",
+          "label": "Welke planologische bestemming geldt op de plaats van de tijdelijke constructie?",
           "type": "select",
           "options": [
             "onbekend",
-            "ja",
-            "nee"
-          ]
+            "geen ruimtelijk kwetsbaar gebied",
+            "parkgebied",
+            "ander ruimtelijk kwetsbaar gebied"
+          ],
+          "helpText": "Controleer de planologische bestemming. Parkgebied behoort tot ruimtelijk kwetsbaar gebied, maar is voor deze tijdelijke vrijstellingsroute uitgezonderd.",
+          "showWhen": {
+            "temp_action": "tijdelijke constructie/evenement"
+          }
         },
         {
           "id": "deforestation",
@@ -1494,7 +4717,18 @@
       "abr": [
         "horecaGent"
       ],
-      "passText": "Vrijstelling mogelijk binnen de tijdelijke maxima, zoals 4 periodes van 30 dagen of de werfduurregeling."
+      "passText": "Vrijstelling mogelijk binnen de tijdelijke maxima, zoals 4 periodes van 30 dagen of de werfduurregeling.",
+      "route": {
+        "project_context": [
+          "een woning",
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie",
+          "een terrein of constructie zonder hoofdgebouw",
+          "openbaar domein",
+          "land- of tuinbouw",
+          "groen, bomen of water"
+        ]
+      }
     },
     {
       "id": "terreinen",
@@ -1582,7 +4816,12 @@
         }
       ],
       "abr": [],
-      "passText": "Vrijstelling mogelijk voor herinrichting of tijdelijke/verplaatsbare verblijven binnen de terreinvoorwaarden van hoofdstuk 8."
+      "passText": "Vrijstelling mogelijk voor herinrichting of tijdelijke/verplaatsbare verblijven binnen de terreinvoorwaarden van hoofdstuk 8.",
+      "route": {
+        "project_context": [
+          "een terrein of constructie zonder hoofdgebouw"
+        ]
+      }
     },
     {
       "id": "publiciteit",
@@ -1642,7 +4881,16 @@
         }
       ],
       "abr": [],
-      "passText": "Vrijstelling mogelijk voor de opgesomde publiciteitsinrichtingen, meestal met oppervlakte- en duurtijdvoorwaarden en toets aan de Publiciteitsverordening."
+      "passText": "Vrijstelling mogelijk voor de opgesomde publiciteitsinrichtingen, meestal met oppervlakte- en duurtijdvoorwaarden en toets aan de Publiciteitsverordening.",
+      "route": {
+        "project_context": [
+          "een woning",
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie",
+          "een terrein of constructie zonder hoofdgebouw",
+          "openbaar domein"
+        ]
+      }
     },
     {
       "id": "openbaar_domein",
@@ -1659,6 +4907,17 @@
             "onbekend",
             "ja",
             "nee"
+          ]
+        },
+        {
+          "id": "domain",
+          "label": "Waar gebeurt de handeling?",
+          "type": "select",
+          "options": [
+            "onbekend",
+            "openbaar domein",
+            "wordt openbaar domein",
+            "privaat domein"
           ]
         },
         {
@@ -1716,7 +4975,12 @@
         }
       ],
       "abr": [],
-      "passText": "Vrijstelling mogelijk voor beperkte handelingen op openbaar domein, zoals verharding tot 300 m² en fietsenstalling tot 100 m²/5 m."
+      "passText": "Vrijstelling mogelijk voor beperkte handelingen op openbaar domein, zoals verharding tot 300 m² en fietsenstalling tot 100 m²/5 m.",
+      "route": {
+        "project_context": [
+          "openbaar domein"
+        ]
+      }
     },
     {
       "id": "algemeen_belang",
@@ -1805,7 +5069,15 @@
         "drivewayGent",
         "pavingGent"
       ],
-      "passText": "Vrijstelling mogelijk voor de limitatieve handelingen van algemeen belang binnen hoogte-, volume-, erfgoed- en projectvoorwaarden."
+      "passText": "Vrijstelling mogelijk voor de limitatieve handelingen van algemeen belang binnen hoogte-, volume-, erfgoed- en projectvoorwaarden.",
+      "route": {
+        "project_context": [
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie",
+          "een terrein of constructie zonder hoofdgebouw",
+          "openbaar domein"
+        ]
+      }
     },
     {
       "id": "telecom",
@@ -1872,7 +5144,16 @@
         }
       ],
       "abr": [],
-      "passText": "Vrijstelling mogelijk voor telecom in/aan/op bestaande infrastructuur, dakinstallaties, schotels, kabels en glasvezelnetwerken binnen de voorwaarden."
+      "passText": "Vrijstelling mogelijk voor telecom in/aan/op bestaande infrastructuur, dakinstallaties, schotels, kabels en glasvezelnetwerken binnen de voorwaarden.",
+      "route": {
+        "project_context": [
+          "een woning",
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie",
+          "een terrein of constructie zonder hoofdgebouw",
+          "openbaar domein"
+        ]
+      }
     },
     {
       "id": "divers",
@@ -1955,11 +5236,34 @@
           ]
         }
       ],
-      "abr": [
-        "ditchGent",
-        "pavingGent"
-      ],
-      "passText": "Vrijstelling mogelijk voor kleine reliëfwijzigingen, infiltratievoorzieningen, laadpalen op verharding, baangrachten, jachtkansels en vogelkijkhutten binnen de maxima."
+      "abr": [],
+      "passText": "Vrijstelling mogelijk voor kleine reliëfwijzigingen, infiltratievoorzieningen, laadpalen op verharding, baangrachten, jachtkansels en vogelkijkhutten binnen de maxima.",
+      "route": {
+        "project_context": [
+          "een terrein of constructie zonder hoofdgebouw",
+          "openbaar domein",
+          "land- of tuinbouw",
+          "groen, bomen of water"
+        ]
+      },
+      "conditionalAbr": [
+        {
+          "when": {
+            "diverse_action": "baangracht overwelven/inbuizen"
+          },
+          "include": "ditchGent"
+        },
+        {
+          "when": {
+            "diverse_action": [
+              "kleine reliëfwijziging",
+              "bovengrondse infiltratievoorziening",
+              "laadpaal op bestaande verharding"
+            ]
+          },
+          "include": "pavingGent"
+        }
+      ]
     },
     {
       "id": "afbraak",
@@ -2017,7 +5321,165 @@
         }
       ],
       "abr": [],
-      "passText": "Vrijstelling mogelijk voor afbraak van vrijgestelde constructies, bepaalde vrijstaande bouwwerken, verhardingen en pylonen/masten met erfgoed- en volumedrempels."
+      "passText": "Vrijstelling mogelijk voor afbraak van vrijgestelde constructies, bepaalde vrijstaande bouwwerken, verhardingen en pylonen/masten met erfgoed- en volumedrempels.",
+      "route": {
+        "project_context": [
+          "een woning",
+          "een ander gebouw dan een woning",
+          "een gemengd gebouw met een woonfunctie en een andere functie",
+          "een terrein of constructie zonder hoofdgebouw"
+        ]
+      }
+    }
+  ],
+  "routeQuestions": [
+    {
+      "id": "project_context",
+      "label": "Waarop heeft de voorgenomen handeling betrekking?",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "een woning",
+        "een ander gebouw dan een woning",
+        "een gemengd gebouw met een woonfunctie en een andere functie",
+        "een terrein of constructie zonder hoofdgebouw",
+        "openbaar domein",
+        "land- of tuinbouw",
+        "groen, bomen of water"
+      ]
+    },
+    {
+      "id": "housing_building_type",
+      "label": "Welk type woning of woongebouw is betrokken bij de handeling?",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "eengezinswoning",
+        "meergezinswoning of appartementsgebouw",
+        "schakelwoning",
+        "studio",
+        "kamerwoning",
+        "hospitawoning",
+        "studentenhuisvesting",
+        "ander woongebouw"
+      ],
+      "showWhenAny": [
+        {
+          "field": "project_context",
+          "equals": "een woning"
+        },
+        {
+          "field": "project_context",
+          "equals": "een gemengd gebouw met een woonfunctie en een andere functie"
+        }
+      ]
+    },
+    {
+      "id": "other_building_type",
+      "label": "Welk type ander gebouw of welke niet-woonfunctie is betrokken bij de handeling?",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "handelsgebouw of handelsruimte",
+        "horecagebouw of horecaruimte",
+        "kantoor of dienstengebouw",
+        "bedrijfs- of industriegebouw",
+        "landbouwbedrijfsgebouw",
+        "gemeenschapsvoorziening",
+        "school of onderwijsgebouw",
+        "zorgvoorziening",
+        "sport- of recreatiegebouw",
+        "religieus gebouw",
+        "technisch gebouw of nutsgebouw",
+        "ander niet-woongebouw"
+      ],
+      "showWhenAny": [
+        {
+          "field": "project_context",
+          "equals": "een ander gebouw dan een woning"
+        },
+        {
+          "field": "project_context",
+          "equals": "een gemengd gebouw met een woonfunctie en een andere functie"
+        }
+      ]
+    },
+    {
+      "id": "mixed_building_part",
+      "label": "Op welk deel van het gemengde gebouw heeft de handeling betrekking?",
+      "type": "select",
+      "options": [
+        "onbekend",
+        "uitsluitend het woongedeelte",
+        "uitsluitend het niet-woongedeelte",
+        "gemeenschappelijke delen of de volledige gebouwschil",
+        "meerdere delen"
+      ],
+      "showWhen": {
+        "project_context": "een gemengd gebouw met een woonfunctie en een andere functie"
+      }
+    }
+  ],
+  "architectureDecisions": [
+    {
+      "id": "H3-01",
+      "status": "implemented",
+      "decision": "Projectcontext en gebouwtype worden vóór de themakeuze bepaald. Hoofdstuk 3 is opgesplitst in subthema’s per handeling. Woonkwaliteit wordt alleen geladen voor een woning of het woongedeelte van een gemengd gebouw."
+    },
+    {
+      "id": "ALG-01",
+      "status": "implemented",
+      "decision": "Erfgoed verwijderd van landing; waar relevant thematisch bevraagd."
+    },
+    {
+      "id": "ALG-03",
+      "status": "implemented",
+      "decision": "Domeinvraag verwijderd van landing en toegevoegd aan hoofdstuk 10."
+    },
+    {
+      "id": "ABR-01",
+      "status": "implemented",
+      "decision": "Groendakcontrole voorlopig volledig verwijderd."
+    },
+    {
+      "id": "ABR-02",
+      "status": "implemented",
+      "decision": "Brede ABR-koppelingen vervangen door conditionele koppelingen waar een subhandeling beschikbaar is."
+    },
+    {
+      "id": "WON-02-WON-21",
+      "status": "implemented",
+      "decision": "Goedgekeurde aanpassingen uit het beslissingenregister verwerkt."
+    },
+    {
+      "id": "NEXT-01",
+      "status": "on_hold",
+      "decision": "Hoofdstukken 4 tot en met 13 worden inhoudelijk in een volgende ronde behandeld."
+    },
+    {
+      "id": "ALG-MER-01",
+      "status": "implemented",
+      "decision": "De algemene MER-, passende-beoordelings- en mobiliteitsstudievraag is verwijderd uit de dummyversie."
+    },
+    {
+      "id": "H123-01",
+      "status": "implemented",
+      "decision": "Erfgoed wordt gericht bevraagd bij gevel- en dakwerken, buitenisolatie en zonnepanelen op gevel of balkonafsluiting."
+    },
+    {
+      "id": "H123-02",
+      "status": "implemented",
+      "decision": "MER, passende beoordeling en mobiliteitsstudie blijven bewust buiten de dummyversie."
+    },
+    {
+      "id": "H123-03",
+      "status": "implemented",
+      "decision": "De 30-meterregel en ruimtelijk-kwetsbaarheidsregels worden alleen toegevoegd aan de handelingen waarop artikel 2.2 of 3.2 ze toepast."
+    },
+    {
+      "id": "H123-04",
+      "status": "implemented",
+      "decision": "Hoofdstuk 3 bevat voortaan ook ondergrondse constructies, warmtepompen/airco’s en kleine tuinconstructies."
     }
   ]
 }
