@@ -4,115 +4,143 @@ const state = {
   step: 'landing',
   rules: null,
   context: {},
+  route: {},
   theme: null,
   answers: {},
   filter: ''
 };
 
 const app = document.getElementById('app');
-
 init();
 
 async function init() {
   try {
     const response = await fetch('data/rules.json', { cache: 'no-store' });
-    if (!response.ok) throw new Error(`rules.json kon niet geladen worden: ${response.status}`);
+    if (!response.ok) throw new Error(`rules.json kon niet worden geladen (${response.status})`);
     state.rules = await response.json();
+    sanitizeDummyRules();
     renderLanding();
   } catch (error) {
+    app.innerHTML = `<section class="panel result bad"><h1>De checker kon niet starten</h1><p>${escapeHtml(error.message)}</p></section>`;
     console.error(error);
-    app.innerHTML = `
-      <section class="panel result bad">
-        <span class="pill bad">FOUT</span>
-        <h1>De checker kon niet laden</h1>
-        <p>Controleer of <code>data/rules.json</code> geldige JSON bevat en of je de app via een lokale server opent.</p>
-        <pre>${escapeHtml(error.message)}</pre>
-      </section>`;
+  }
+}
+
+function sanitizeDummyRules() {
+  state.rules.contextQuestions = (state.rules.contextQuestions || []).filter(question => question.id !== 'gis_mer');
+  state.rules.globalChecks = (state.rules.globalChecks || []).filter(check => check.id !== 'impact_study' && !Object.prototype.hasOwnProperty.call(check.when || {}, 'gis_mer'));
+  for (const check of state.rules.globalChecks) {
+    if (Array.isArray(check.unknowns)) check.unknowns = check.unknowns.filter(field => field !== 'gis_mer');
   }
 }
 
 function stepper(active) {
   const steps = [
     ['landing', 'Adres & context'],
+    ['route', 'Projectcontext'],
     ['themes', 'Thema'],
     ['checklist', 'Checklist'],
     ['result', 'Conclusie']
   ];
-
-  return `<nav class="stepper" aria-label="Stappen">${steps
-    .map(([id, label]) => `<span class="step ${id === active ? 'active' : ''}">${label}</span>`)
-    .join('')}</nav>`;
+  return `<nav class="stepper" aria-label="Stappen">${steps.map(([id, label]) => `<span class="step ${id === active ? 'active' : ''}">${label}</span>`).join('')}</nav>`;
 }
 
 function renderLanding() {
   state.step = 'landing';
-
-  app.innerHTML = `
-    ${stepper('landing')}
+  app.innerHTML = `${stepper('landing')}
     <section class="hero">
       <h1>Controleer of een handeling mogelijk vrijgesteld is</h1>
-      <p class="lead">Geef eerst een adres in. In deze prototypeversie vraagt de app de planologische context manueel op. Later vult FME/GIS deze velden automatisch aan.</p>
+      <p class="lead">Vul eerst het adres en de algemene context in. Deze dummyversie werkt zonder automatische FME-koppeling.</p>
     </section>
     <section class="panel" style="margin-top:1rem">
-      <h2>Adres en context</h2>
+      <h2>Adres en algemene context</h2>
       <form id="contextForm" class="grid grid-2">
-        ${state.rules.contextQuestions.map(renderField).join('')}
-        <div class="actions">
-          <button class="btn blue" type="submit">Ga naar themakeuze</button>
-        </div>
+        ${state.rules.contextQuestions.map(q => renderField(q, state.context)).join('')}
+        <div class="actions"><button class="btn blue" type="submit">Ga naar projectcontext</button></div>
       </form>
-      <p class="footer-note">FME-placeholder actief: <code>src/fme-placeholder.js</code>. Nu wordt alleen een dummy-context gebruikt.</p>
     </section>`;
-
-  hydrateForm('contextForm', state.context);
 
   document.getElementById('contextForm').addEventListener('submit', async event => {
     event.preventDefault();
     state.context = readForm(event.target);
+    try {
+      const gis = await fetchParcelContext(state.context.address || '');
+      if (gis?.context) state.context = { ...state.context, ...gis.context };
+    } catch (error) {
+      console.warn('FME-placeholder gaf geen context terug.', error);
+    }
+    renderRoute();
+  });
+}
 
-    const gis = await fetchParcelContext(state.context.address || '');
-    if (gis?.context) state.context = { ...state.context, ...gis.context };
+function renderRoute() {
+  state.step = 'route';
+  app.innerHTML = `${stepper('route')}
+    <section class="panel">
+      <h1>Waarover gaat de handeling?</h1>
+      <p class="muted">Deze keuze bepaalt welke thema's en vragen relevant zijn.</p>
+      <form id="routeForm">
+        <div id="routeFields"></div>
+        <div class="actions">
+          <button class="btn blue" type="submit">Toon relevante thema's</button>
+          <button class="btn secondary" type="button" id="backLanding">Terug</button>
+        </div>
+      </form>
+    </section>`;
 
+  const form = document.getElementById('routeForm');
+  form.addEventListener('change', () => {
+    state.route = { ...state.route, ...readForm(form) };
+    renderDynamicFields('routeFields', state.rules.routeQuestions || [], state.route, 'routeForm');
+  });
+  renderDynamicFields('routeFields', state.rules.routeQuestions || [], state.route, 'routeForm');
+  document.getElementById('backLanding').onclick = renderLanding;
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    state.route = readForm(form);
+    if (!state.route.project_context || state.route.project_context === 'onbekend') {
+      alert('Kies eerst waarop de handeling betrekking heeft.');
+      return;
+    }
     renderThemes();
   });
 }
 
 function renderThemes() {
   state.step = 'themes';
+  const query = state.filter.trim().toLowerCase();
+  const themes = state.rules.themes.filter(theme => routeMatches(theme.route, state.route)).filter(theme => {
+    const haystack = [theme.title, theme.chapter, theme.article, ...(theme.tags || []), theme.passText, ...(theme.questions || []).map(q => q.label), ...(theme.questions || []).flatMap(q => q.options || [])].join(' ').toLowerCase();
+    return haystack.includes(query);
+  });
 
-  const filter = state.filter.trim().toLowerCase();
-  const themes = state.rules.themes.filter(theme => themeMatchesFilter(theme, filter));
-
-  app.innerHTML = `
-    ${stepper('themes')}
+  app.innerHTML = `${stepper('themes')}
     <section class="panel">
       <h1>Wat wil de burger doen?</h1>
-      <p class="muted">Kies het thema dat het best aansluit. Alle hoofdstukken van het Vrijstellingsbesluit zijn opgenomen.</p>
-      <input class="searchbar" id="filter" placeholder="Zoek op gevel, isolatie, boom, publiciteit, telecom..." value="${escapeHtml(state.filter)}" autocomplete="off">
-      <div class="grid grid-3" id="themeGrid">
-        ${themes.length ? themes.map(renderThemeTile).join('') : '<p class="muted">Geen thema gevonden. Probeer een andere zoekterm.</p>'}
+      <p class="muted">Er worden alleen thema's getoond die passen bij de gekozen projectcontext.</p>
+      <input class="searchbar" id="filter" placeholder="Zoek op gevel, boom, publiciteit, telecom..." value="${escapeHtml(state.filter)}">
+      <div class="grid grid-3">
+        ${themes.length ? themes.map(theme => `<button class="card tile" data-theme="${escapeHtml(theme.id)}"><span class="chapter">${escapeHtml(theme.chapter)} - ${escapeHtml(theme.article)}</span><h3>${escapeHtml(theme.title)}</h3><p class="small">${escapeHtml(theme.passText)}</p></button>`).join('') : '<p>Geen thema gevonden voor deze projectcontext of zoekterm.</p>'}
       </div>
       <div class="actions">
-        <button class="btn secondary" id="back">Terug</button>
+        <button class="btn secondary" id="backRoute">Projectcontext aanpassen</button>
+        <button class="btn secondary" id="backLanding">Adres en context aanpassen</button>
       </div>
     </section>`;
 
-  const filterInput = document.getElementById('filter');
-  filterInput.addEventListener('input', event => {
-    const cursorPos = event.target.selectionStart;
+  const filter = document.getElementById('filter');
+  filter.addEventListener('input', event => {
+    const cursor = event.target.selectionStart;
     state.filter = event.target.value;
     renderThemes();
-
     requestAnimationFrame(() => {
-      const input = document.getElementById('filter');
-      if (input) {
-        input.focus();
-        input.setSelectionRange(cursorPos, cursorPos);
-      }
+      const next = document.getElementById('filter');
+      next?.focus();
+      next?.setSelectionRange(cursor, cursor);
     });
   });
-
-  document.getElementById('back').onclick = renderLanding;
+  document.getElementById('backRoute').onclick = renderRoute;
+  document.getElementById('backLanding').onclick = renderLanding;
   document.querySelectorAll('[data-theme]').forEach(button => {
     button.onclick = () => {
       state.theme = state.rules.themes.find(theme => theme.id === button.dataset.theme);
@@ -122,48 +150,16 @@ function renderThemes() {
   });
 }
 
-function themeMatchesFilter(theme, filter) {
-  if (!filter) return true;
-
-  const questionText = (theme.questions || [])
-    .map(question => `${question.label || ''} ${(question.options || []).join(' ')}`)
-    .join(' ');
-
-  const haystack = [
-    theme.id,
-    theme.title,
-    theme.chapter,
-    theme.article,
-    theme.passText,
-    ...(theme.tags || []),
-    questionText
-  ].join(' ').toLowerCase();
-
-  return haystack.includes(filter);
-}
-
-function renderThemeTile(theme) {
-  return `
-    <button class="card tile" data-theme="${theme.id}">
-      <span class="chapter">${theme.chapter} - ${theme.article}</span>
-      <h3>${escapeHtml(theme.title)}</h3>
-      <p class="small">${escapeHtml(theme.passText)}</p>
-    </button>`;
-}
-
 function renderChecklist() {
+  state.step = 'checklist';
   const theme = state.theme;
-  const abrQuestions = (theme.abr || []).flatMap(id => state.rules.abrChecks[id]?.questions || []);
-  const questions = [...theme.questions, ...abrQuestions];
-
-  app.innerHTML = `
-    ${stepper('checklist')}
+  app.innerHTML = `${stepper('checklist')}
     <section class="panel">
-      <span class="pill">${theme.chapter} - ${theme.article}</span>
+      <span class="pill">${escapeHtml(theme.chapter)} - ${escapeHtml(theme.article)}</span>
       <h1>${escapeHtml(theme.title)}</h1>
       <p>${escapeHtml(theme.passText)}</p>
       <form id="checkForm">
-        ${questions.map(question => `<div class="answer-row">${renderField(question)}</div>`).join('')}
+        <div id="checkFields"></div>
         <div class="actions">
           <button class="btn blue" type="submit">Maak conclusie</button>
           <button class="btn secondary" type="button" id="backThemes">Terug naar thema's</button>
@@ -171,12 +167,90 @@ function renderChecklist() {
       </form>
     </section>`;
 
-  hydrateForm('checkForm', state.answers);
+  const form = document.getElementById('checkForm');
+  const redraw = () => {
+    state.answers = { ...state.answers, ...readForm(form) };
+    const questions = getAllApplicableQuestions(state.answers);
+    renderDynamicFields('checkFields', questions, state.answers, 'checkForm');
+  };
+  form.addEventListener('change', redraw);
+  redraw();
+
   document.getElementById('backThemes').onclick = renderThemes;
-  document.getElementById('checkForm').addEventListener('submit', event => {
+  form.addEventListener('submit', event => {
     event.preventDefault();
-    state.answers = readForm(event.target);
+    state.answers = readForm(form);
     renderResult();
+  });
+}
+
+function getActiveAbrIds(answers = state.answers) {
+  const ids = new Set(state.theme?.abr || []);
+  for (const link of state.theme?.conditionalAbr || []) {
+    if (conditionObjectMatches(link.when || {}, answers)) ids.add(link.include);
+  }
+  return [...ids].filter(id => state.rules.abrChecks[id]);
+}
+
+function getAllApplicableQuestions(answers = state.answers) {
+  const direct = state.theme?.questions || [];
+  const abr = getActiveAbrIds(answers).flatMap(id => state.rules.abrChecks[id]?.questions || []);
+  return [...direct, ...abr];
+}
+
+function getVisibleQuestions(answers = state.answers) {
+  return getAllApplicableQuestions(answers).filter(question => questionVisible(question, answers));
+}
+
+function renderDynamicFields(containerId, questions, values, formId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const visible = questions.filter(question => questionVisible(question, values));
+  container.innerHTML = visible.map(question => `<div class="answer-row">${renderField(question, values)}</div>`).join('');
+  hydrateForm(formId, values);
+}
+
+function questionVisible(question, answers) {
+  if (question.showWhen && !conditionObjectMatches(question.showWhen, answers)) return false;
+  if (question.showWhenIncludes && !conditionIncludesMatches(question.showWhenIncludes, answers)) return false;
+  if (question.showWhenAll && !question.showWhenAll.every(condition => singleConditionMatches(condition, answers))) return false;
+  if (question.showWhenAny && !question.showWhenAny.some(condition => singleConditionMatches(condition, answers))) return false;
+  return true;
+}
+
+function conditionObjectMatches(condition, answers) {
+  return Object.entries(condition || {}).every(([field, expected]) => valueMatches(answers[field], expected));
+}
+
+function conditionIncludesMatches(condition, answers) {
+  return Object.entries(condition || {}).every(([field, expected]) => asArray(answers[field]).includes(String(expected)));
+}
+
+function singleConditionMatches(condition, answers) {
+  const value = answers[condition.field];
+  if (isUnknown(value)) return false;
+  if ('equals' in condition) return valueMatches(value, condition.equals);
+  if ('includes' in condition) return asArray(value).includes(String(condition.includes));
+  if ('in' in condition) return asArray(condition.in).some(candidate => valueMatches(value, candidate));
+  if ('greaterThan' in condition) return numeric(value) > Number(condition.greaterThan);
+  if ('greaterThanOrEqual' in condition) return numeric(value) >= Number(condition.greaterThanOrEqual);
+  if ('lessThan' in condition) return numeric(value) < Number(condition.lessThan);
+  if ('lessThanOrEqual' in condition) return numeric(value) <= Number(condition.lessThanOrEqual);
+  if ('equalsNumber' in condition) return numeric(value) === Number(condition.equalsNumber);
+  return false;
+}
+
+function valueMatches(actual, expected) {
+  if (Array.isArray(expected)) return expected.some(item => valueMatches(actual, item));
+  if (Array.isArray(actual)) return actual.includes(String(expected));
+  return String(actual ?? '') === String(expected ?? '');
+}
+
+function routeMatches(route, values) {
+  if (!route) return true;
+  return Object.entries(route).every(([field, allowed]) => {
+    if (field === 'mixed_building_part' && values.project_context !== 'een gemengd gebouw met een woonfunctie en een andere functie') return true;
+    return valueMatches(values[field], allowed);
   });
 }
 
@@ -184,9 +258,7 @@ function renderResult() {
   const evaluation = evaluate();
   const cls = evaluation.status === 'vrijgesteld' ? 'ok' : evaluation.status === 'niet vrijgesteld' ? 'bad' : '';
   const copyText = buildCopyText(evaluation);
-
-  app.innerHTML = `
-    ${stepper('result')}
+  app.innerHTML = `${stepper('result')}
     <section class="panel result ${cls}">
       <span class="pill ${cls || 'warn'}">${evaluation.status.toUpperCase()}</span>
       <h1>Conclusie</h1>
@@ -201,278 +273,217 @@ function renderResult() {
         <button class="btn secondary" id="new">Nieuwe check</button>
       </div>
     </section>`;
-
   document.getElementById('copyBtn').onclick = async () => {
     await navigator.clipboard.writeText(copyText);
     document.getElementById('copyBtn').textContent = 'Gekopieerd';
   };
-
   document.getElementById('edit').onclick = renderChecklist;
-  document.getElementById('new').onclick = resetCheck;
-}
-
-function resetCheck() {
-  state.context = {};
-  state.theme = null;
-  state.answers = {};
-  state.filter = '';
-  renderLanding();
+  document.getElementById('new').onclick = () => {
+    state.context = {};
+    state.route = {};
+    state.theme = null;
+    state.answers = {};
+    state.filter = '';
+    renderLanding();
+  };
 }
 
 function evaluate() {
   const reasons = [];
-  let not = false;
-  let research = false;
+  const markers = { not: false, research: false, additional: false };
+  const answers = state.answers;
+  const theme = state.theme;
+  const visibleQuestions = getVisibleQuestions(answers);
+  const visibleIds = new Set(visibleQuestions.map(question => question.id));
 
-  for (const globalCheck of state.rules.globalChecks) {
-    if (globalCheck.when && Object.entries(globalCheck.when).every(([key, value]) => state.context[key] === value)) {
-      reasons.push(globalCheck.reason);
-      if (globalCheck.kind === 'not') not = true;
-    }
-
-    if (globalCheck.unknowns && globalCheck.unknowns.some(key => !state.context[key] || state.context[key] === 'onbekend')) {
-      reasons.push(globalCheck.reason);
-      research = true;
-    }
-  }
-
-  const a = state.answers;
-  const t = state.theme;
-
-  for (const value of Object.values(a)) {
-    if (value === 'onbekend' || value === '') research = true;
-  }
-
-  const ynFail = (id, wanted, text) => {
-    if (a[id] && a[id] !== wanted && a[id] !== 'onbekend') {
-      not = true;
-      reasons.push(text);
-    }
+  const add = (kind, reason, resultMode = null) => {
+    if (!reason || reasons.includes(reason)) return;
+    reasons.push(reason);
+    if (kind === 'research') markers.research = true;
+    else if (resultMode === 'additional_regulation') markers.additional = true;
+    else markers.not = true;
   };
 
-  ynFail('legal', 'ja', 'De bestaande toestand is niet hoofdzakelijk vergund of vergund geacht.');
-  ynFail('mainlyPermitted', 'ja', 'De woning is niet hoofdzakelijk vergund of vergund geacht.');
-  ynFail('function_change', 'nee', 'Er wordt een vergunningsplichtige functiewijziging doorgevoerd.');
-  ynFail('housing_units', 'ja', 'Het aantal woongelegenheden blijft niet gelijk.');
-  ynFail('rain_own', 'ja', 'Het hemelwater blijft niet op eigen terrein.');
-  ynFail('deforestation', 'nee', 'De handeling gaat gepaard met ontbossing of een uitgesloten wijziging.');
-  ynFail('heritage_visible', 'nee', 'Erfgoed- of UNESCO-context blokkeert deze zichtbare handeling in de vrijstellingslogica.');
-  ynFail('cross_rooilijn', 'nee', 'De rooilijn wordt overschreden.');
-  ynFail('visible_road', 'nee', 'De plaatsing of opslag is zichtbaar vanaf de openbare weg.');
-  ynFail('actual_living', 'nee', 'De verplaatsbare inrichting wordt effectief bewoond.');
-  ynFail('forest', 'nee', 'Bomen in bos vallen buiten deze vrijstelling.');
-  ynFail('permeable_replaced', 'nee', 'Waterdoorlatende verharding wordt vervangen door niet-waterdoorlatende verharding.');
-  ynFail('publicity_regulation', 'ja', 'De publiciteit voldoet niet aan de Publiciteitsverordening.');
-  ynFail('creates_building', 'nee', 'Voor deze telecomvrijstelling mag geen gebouw worden opgericht.');
-  ynFail('heritage_object', 'nee', 'Er is erfgoedwaarde of inventariscontext bij de afbraak.');
-
-  // Specifieke controle tijdelijke handelingen / pop-up per goed.
-  if (t.id === 'tijdelijk') {
-    const previousPeriods = Number(a.previous_popup_periods_30 || 0);
-    const requestedPeriods = Number(a.periods_30 || 0);
-    const totalPeriods = previousPeriods + requestedPeriods;
-
-    if (a.previous_popup_same_good === 'onbekend') {
-      research = true;
-      reasons.push('Het is niet duidelijk of er dit kalenderjaar al een pop-up of tijdelijke functiewijziging op hetzelfde goed is geweest.');
-    }
-
-    if (a.previous_popup_same_good === 'ja' && !a.previous_popup_periods_30) {
-      research = true;
-      reasons.push('Het aantal eerder gebruikte periodes van 30 dagen op hetzelfde goed is nog niet ingevuld.');
-    }
-
-    if (totalPeriods > 4) {
-      not = true;
-      reasons.push('Op hetzelfde goed worden meer dan 4 periodes van 30 aaneengesloten dagen per kalenderjaar gebruikt. Daardoor valt de tijdelijke handeling niet onder de vrijstelling.');
-    }
+  for (const check of state.rules.globalChecks || []) {
+    if (check.when && conditionObjectMatches(check.when, state.context)) add(check.kind, check.reason);
+    if (check.unknowns?.some(field => isUnknown(state.context[field]))) add('research', check.reason);
   }
 
-  // Specifieke controle bomen in Gent.
-  if (t.id === 'groen_boom') {
-    if (a.tree_circumference_1m && +a.tree_circumference_1m >= 50) {
-      not = true;
-      reasons.push('De stamomtrek van de boom is minstens 50 cm op 1 meter hoogte. In Gent is de handeling daardoor vergunningsplichtig.');
-    }
-
-    if (a.tree_circumference_base && +a.tree_circumference_base >= 75) {
-      not = true;
-      reasons.push('De stamomtrek van de boom is minstens 75 cm aan het maaiveld. In Gent is de handeling daardoor vergunningsplichtig.');
-    }
+  for (const question of visibleQuestions) {
+    if (isUnknown(answers[question.id])) add('research', `Nog in te vullen: ${question.label}`);
   }
 
-  // Specifieke controle warmtepomp/airco bij woningen.
-  if (t.id === 'woning_airco') {
-    const distance = Number(a.airco_distance);
+  const fail = (id, wanted, reason) => {
+    if (visibleIds.has(id) && !isUnknown(answers[id]) && answers[id] !== wanted) add('not', reason);
+  };
+  fail('legal', 'ja', 'De bestaande toestand is niet hoofdzakelijk vergund of vergund geacht.');
+  fail('building_not_house', 'ja', 'De gekozen route geldt alleen voor een gebouw of gebouwdeel dat geen woning is.');
+  fail('function_change', 'nee', 'Er wordt een vergunningsplichtige functiewijziging doorgevoerd.');
+  fail('housing_units', 'ja', 'Het aantal woongelegenheden blijft niet gelijk.');
+  fail('within_30m', 'ja', 'De handeling wordt niet volledig binnen de vereiste straal van 30 meter uitgevoerd.');
+  fail('rain_own', 'ja', 'Het hemelwater blijft niet op eigen terrein.');
+  fail('deforestation', 'nee', 'De handeling gaat gepaard met ontbossing of een uitgesloten wijziging.');
+  fail('visible_road', 'nee', 'De plaatsing of opslag is zichtbaar vanaf de openbare weg.');
+  fail('actual_living', 'nee', 'In de verplaatsbare inrichting wordt gewoond.');
+  fail('forest', 'nee', 'Een boom die deel uitmaakt van een bos valt niet onder deze eenvoudige vrijstellingsroute.');
+  fail('permeable_replaced', 'nee', 'Waterdoorlatende verharding wordt vervangen door niet-waterdoorlatende verharding.');
+  fail('publicity_regulation', 'ja', 'De publiciteit voldoet niet aan de Publiciteitsverordening.');
+  fail('creates_building', 'nee', 'Voor deze telecomvrijstelling mag geen gebouw worden opgericht.');
+  fail('heritage_object', 'nee', 'Er is erfgoedwaarde of inventariscontext bij de afbraak.');
 
-    if (a.airco_place === 'ander') {
-      not = true;
-      reasons.push('Het buitendeel van de warmtepomp of airco wordt niet geplaatst in de tuin, op een gevel of op een plat dak.');
-    }
+  numericMax('insulation_cm', 26, 'De buitenisolatie inclusief afwerking is dikker dan 26 cm.');
+  numericMax('area_total', inferAreaMax(theme.id), `De opgegeven oppervlakte overschrijdt de richtdrempel voor ${theme.article}.`);
+  numericMax('height', inferHeightMax(theme.id), `De opgegeven hoogte overschrijdt de richtdrempel voor ${theme.article}.`);
+  
+  numericMax('volume', inferVolumeMax(theme.id), `Het opgegeven volume overschrijdt de richtdrempel voor ${theme.article}.`);
+  numericMax('periods_30', 4, 'De vier periodes van 30 dagen per kalenderjaar worden overschreden.');
+  numericMax('duration_years', 2, 'De maximale duur voor tijdelijke verplaatsbare constructies tijdens werken wordt overschreden.');
 
-    if (!a.airco_distance && a.airco_against_wall !== 'ja') {
-      research = true;
-      reasons.push('De afstand van het buitendeel tot de perceelsgrens is nog niet ingevuld.');
-    }
+  evaluateDeclarativeRules(theme.rules, add, answers);
+  for (const abrId of getActiveAbrIds(answers)) evaluateAbr(abrId, add, answers, visibleIds);
+  evaluateTemporaryAndIndustry(add, answers, theme.id);
 
-    if (a.airco_against_wall === 'onbekend') {
-      research = true;
-      reasons.push('Het is nog niet duidelijk of het buitendeel tegen een bestaande scheidingsmuur wordt geplaatst.');
-    }
-
-    if (a.airco_against_wall === 'ja') {
-      // Vrijgesteld op basis van plaatsing tegen bestaande scheidingsmuur.
-    } else if (a.airco_distance && distance >= 2) {
-      // Vrijgesteld op basis van afstand van minstens 2 meter.
-    } else if (a.airco_distance && distance > 0 && distance < 2) {
-      not = true;
-      reasons.push('Het buitendeel staat op meer dan 0 meter en minder dan 2 meter van de perceelsgrens. Daardoor valt de plaatsing niet onder de vrijstelling.');
-    } else if (a.airco_distance && distance === 0 && a.airco_against_wall === 'nee') {
-      not = true;
-      reasons.push('Het buitendeel staat op de perceelsgrens, maar wordt niet tegen een bestaande scheidingsmuur geplaatst. Daardoor valt de plaatsing niet onder de vrijstelling.');
-    }
-  }
-
-  // Specifieke controle zonnepanelen/zonneboiler bij woningen.
-  if (t.id === 'woning_zonnepanelen') {
-    if (a.placementType === 'op een andere plaats') {
-      not = true;
-      reasons.push('De zonnepanelen of zonneboiler worden niet geplaatst volgens een plaatsingswijze die in artikel 2.1, 3° is opgenomen.');
-    }
-
-    if (a.placementType === 'op een plat dak' && +a.heightAboveRoofEdgeM > 1) {
-      not = true;
-      reasons.push('Bij plaatsing op een plat dak mogen zonnepanelen of zonneboilers maximaal 1 meter boven de dakrand uitkomen.');
-    }
-
-    if (a.placementType === 'op een gevel' && +a.facadeAreaM2 > 4) {
-      not = true;
-      reasons.push('Bij plaatsing op een gevel is de vrijstelling beperkt tot maximaal 4 m² per gevel.');
-    }
-
-    if (
-      (a.placementType === 'op een gevel' || a.placementType === 'aan een balkonafsluiting') &&
-      a.worldHeritageZone === 'ja'
-    ) {
-      not = true;
-      reasons.push('Voor plaatsing op een gevel of balkonafsluiting geldt de vrijstelling niet in werelderfgoed of in een bufferzone van werelderfgoed.');
-    }
-
-    if (
-      (a.placementType === 'op een gevel' || a.placementType === 'aan een balkonafsluiting') &&
-      a.inventoryHeritageNotProtected === 'ja'
-    ) {
-      not = true;
-      reasons.push('Voor plaatsing op een gevel of balkonafsluiting geldt de vrijstelling niet bij een gebouw op de vastgestelde inventaris van bouwkundig erfgoed dat niet beschermd is.');
-    }
-  }
-
-  numMax('insulation_cm', 26, 'De buitenisolatie is dikker dan 26 cm.');
-  numMax('area_total', inferAreaMax(t.id), `De opgegeven oppervlakte overschrijdt de richtdrempel voor ${t.article}.`);
-  numMax('height', inferHeightMax(t.id), `De opgegeven hoogte overschrijdt de richtdrempel voor ${t.article}.`);
-  numMax('above_ridge', 3, 'De technische constructie steekt meer dan 3 m boven de nok uit.');
-  numMax('volume', inferVolumeMax(t.id), `Het opgegeven volume overschrijdt de richtdrempel voor ${t.article}.`);
-  numMax('periods_30', 4, 'De 4 periodes van 30 dagen per kalenderjaar worden overschreden.');
-  numMax('duration_years', 2, 'De maximale duur voor tijdelijke verplaatsbare constructies tijdens werken wordt overschreden.');
-  numMax('relief_cm', 50, 'De reliëfwijziging is 50 cm of meer waar de kleine vrijstelling dat beperkt.');
-
-  // ABR checks.
-  if ((+a.abr_tree_circ_1m >= 50) || (+a.abr_tree_circ_base >= 75)) {
-    not = true;
-    reasons.push(state.rules.abrChecks.treeGent.fail);
-  }
-
-  if (+a.abr_driveway_count > 1 && state.context.zone !== 'afgebakend zeehavengebied') {
-    not = true;
-    reasons.push('ABR: buiten zeehavengebied is standaard maximaal één oprit toegestaan.');
-  }
-
-  if (+a.abr_driveway_slope > 4) {
-    not = true;
-    reasons.push('ABR: de oprit heeft in de eerste 5 m vanaf de rooilijn meer dan 4% helling.');
-  }
-
-  if (a.abr_driveway_autofree === 'ja') {
-    not = true;
-    reasons.push('ABR: nieuwe opritten naar private parkeerplaatsen in autovrij gebied zijn niet toegestaan.');
-  }
-
-  const road = +a.abr_driveway_road_width;
-  const width = +a.abr_driveway_width;
-
-  if (road && width) {
-    const max = road <= 4
-      ? 4.5
-      : road <= 4.5
-        ? 4
-        : road <= 5.5
-          ? 3.5
-          : 3;
-
-    if (width > max) {
-      not = true;
-      reasons.push(`ABR: bij deze rijwegbreedte is de oprit aan de rooilijn maximaal ${max} m.`);
-    }
-  }
-
-  if (a.abr_roof_flat === 'ja' && +a.abr_roof_area > 6 && a.abr_roof_solution === 'nee') {
-    not = true;
-    reasons.push(state.rules.abrChecks.greenRoofGent.fail);
-  }
-
-  if (a.abr_paving_minimal === 'nee' || a.abr_paving_infiltration === 'nee') {
-    not = true;
-    reasons.push(state.rules.abrChecks.pavingGent.fail);
-  }
-
-  if (+a.abr_ditch_length > 5 || a.abr_ditch_one === 'nee' || a.abr_ditch_connections === 'ja') {
-    not = true;
-    reasons.push(state.rules.abrChecks.ditchGent.fail);
-  }
-
-  if (a.abr_horeca_change === 'ja') {
-    not = true;
-    reasons.push(state.rules.abrChecks.horecaGent.fail);
-  }
-
-  if (!reasons.length) reasons.push(t.passText);
-
-  const status = not ? 'niet vrijgesteld' : research ? 'bijkomend onderzoek nodig' : 'vrijgesteld';
+  if (!reasons.length) reasons.push(theme.passText);
+  const status = markers.not || markers.additional ? 'niet vrijgesteld' : markers.research ? 'bijkomend onderzoek nodig' : 'vrijgesteld';
   const summary = status === 'vrijgesteld'
-    ? 'Op basis van de ingevulde gegevens valt de handeling onder een vrijstelling.'
+    ? 'Op basis van de ingevulde gegevens valt de handeling onder een vrijstelling en zijn geen strijdigheden met de opgenomen Gentse controles vastgesteld.'
     : status === 'niet vrijgesteld'
-      ? 'Op basis van de ingevulde gegevens is een omgevingsvergunning voor stedenbouwkundige handelingen nodig.'
+      ? 'Op basis van de ingevulde gegevens is de eenvoudige vrijstellingsroute niet toepasbaar of wordt niet voldaan aan een opgenomen aanvullende Gentse regel.'
       : 'De ingevulde gegevens volstaan nog niet voor een definitieve uitspraak.';
-
   return { status, summary, reasons };
 
-  function numMax(id, max, text) {
-    if (!max) return;
-    const value = +a[id];
-    if (value && value > max) {
-      not = true;
-      reasons.push(text);
+  function numericMax(id, max, reason) {
+    if (!max || !visibleIds.has(id) || isUnknown(answers[id])) return;
+    if (numeric(answers[id]) > max) add('not', reason);
+  }
+}
+
+function evaluateDeclarativeRules(rules, add, answers) {
+  if (!rules) return;
+  for (const rule of rules.notConditions || []) if (ruleMatches(rule, answers)) add('not', rule.reason);
+  for (const rule of rules.researchConditions || []) if (ruleMatches(rule, answers)) add('research', rule.reason);
+  for (const rule of rules.simpleRouteStops || []) if (singleConditionMatches(rule, answers)) add('not', rule.reason);
+  for (const rule of rules.failConditions || []) if (singleConditionMatches(rule, answers)) add('not', 'De ingevoerde situatie voldoet niet aan een toepasselijke Gentse woonkwaliteitsvoorwaarde.', 'additional_regulation');
+  if (rules.seaportOpenMaxHeightM && state.context.zone === 'afgebakend zeehavengebied' && ['open'].includes(answers.fence_openness) && !isUnknown(answers.fence_height)) { if (numeric(answers.fence_height) > rules.seaportOpenMaxHeightM) add('not', `De open afsluiting of toegangspoort is hoger dan ${rules.seaportOpenMaxHeightM} meter.`); return; } for (const rule of rules.heightRules || []) {
+    if (conditionObjectMatches(rule.when || {}, answers) && !isUnknown(answers.fence_height) && numeric(answers.fence_height) > rule.maxHeightM) {
+      add('not', `De afsluiting of toegangspoort is hoger dan de toegelaten ${rule.maxHeightM} meter.`);
     }
+  }
+}
+
+function ruleMatches(rule, answers) {
+  if (rule.all) return rule.all.every(condition => singleConditionMatches(condition, answers));
+  if (rule.any) return rule.any.some(condition => singleConditionMatches(condition, answers));
+  return singleConditionMatches(rule, answers);
+}
+
+function evaluateAbr(id, add, a, visibleIds) {
+  const block = state.rules.abrChecks[id];
+  const additional = block?.resultMode === 'additional_regulation' ? 'additional_regulation' : null;
+  const abrFail = reason => add('not', reason || block?.fail, additional);
+
+  if (id === 'treeGent' && ((numeric(a.abr_tree_circ_1m) >= 50) || (numeric(a.abr_tree_circ_base) >= 75))) abrFail(block.fail);
+  if (id === 'drivewayGent') {
+    if (numeric(a.abr_driveway_count) > 1 && state.context.zone !== 'afgebakend zeehavengebied') abrFail('ABR: buiten het zeehavengebied is standaard maximaal één oprit toegestaan.');
+    if (numeric(a.abr_driveway_slope) > 4) abrFail('ABR: de oprit heeft in de eerste 5 meter vanaf de rooilijn meer dan 4% helling.');
+    if (a.abr_driveway_autofree === 'ja') abrFail('ABR: een nieuwe oprit naar private parkeerplaatsen in autovrij gebied is niet toegestaan.');
+    const road = numeric(a.abr_driveway_road_width), width = numeric(a.abr_driveway_width);
+    if (road && width) {
+      const max = road <= 4 ? 4.5 : road <= 4.5 ? 4 : road <= 5.5 ? 3.5 : 3;
+      if (width > max) abrFail(`ABR: bij deze rijwegbreedte is de oprit aan de rooilijn maximaal ${max} meter breed.`);
+    }
+  }
+  if (id === 'pavingGent' && (a.abr_paving_minimal === 'nee' || a.abr_paving_infiltration === 'nee')) abrFail(block.fail);
+  if (id === 'ditchGent' && (numeric(a.abr_ditch_length) > 5 || a.abr_ditch_one === 'nee' || a.abr_ditch_connections === 'ja')) abrFail(block.fail);
+  if (id === 'horecaGent' && a.abr_horeca_change === 'ja') abrFail(block.fail);
+  if (id === 'facadeStreetGent') evaluateFacadeStreet(block, abrFail, add, a);
+  if (id === 'facadeInsulationGent') {
+    if (numeric(a.abr_insulation_rooilijn_exceed_cm) > block.rules.rooilijnExceedMaxCm) abrFail(`De totale rooilijnoverschrijding door isolatie en afwerking is groter dan ${block.rules.rooilijnExceedMaxCm} cm.`);
+    if (numeric(a.abr_insulation_small_elements_cm) > block.rules.smallConstructiveElementsBeyondInsulationMaxCm) abrFail(`Kleinschalige constructieve elementen springen meer dan ${block.rules.smallConstructiveElementsBeyondInsulationMaxCm} cm voorbij de gevelisolatie.`);
+  }
+  if (id === 'housingQualityGent') evaluateHousingQuality(block, abrFail, add, a, visibleIds);
+}
+
+function evaluateFacadeStreet(block, fail, add, a) {
+  if (a.abr_contact_street_ok === 'nee') fail('De werken aan de garage of garagepoort voldoen niet aan ABR artikel 2.5.');
+  if (a.abr_shopfront_closure === 'ja') fail('De etalage van de handelsruimte krijgt een gesloten gevelafsluiting, in strijd met ABR artikel 2.6.');
+  if (a.abr_projection_new_or_stability !== 'ja') return;
+  if (a.abr_projection_facade_on_building_line === 'nee') add('research', 'De voorgevel staat niet tegen de rooilijn. De toepasselijkheid van ABR artikel 2.7 moet afzonderlijk worden beoordeeld.');
+  const height = numeric(a.abr_projection_height_m), depth = numeric(a.abr_projection_depth_cm);
+  const band = block.article27Rules.heightBands.find(item => height >= item.minHeightM && (item.maxHeightM === null || height < item.maxHeightM));
+  if (band?.contextAssessmentRequired) {
+    if (a.abr_projection_context_ok_above_4m === 'nee') fail('De uitsprong vanaf 4 meter hoogte is niet verenigbaar met de plaatselijke context of het bestemmingsplan.');
+    if (isUnknown(a.abr_projection_context_ok_above_4m)) add('research', 'De uitsprong vanaf 4 meter hoogte vereist een beoordeling van de plaatselijke context en het bestemmingsplan.');
+  } else if (band && depth) {
+    const max = a.abr_projection_element_type === 'constructief element' ? band.constructiveMaxCm : band.nonConstructiveMaxCm;
+    if (max != null && depth > max) fail(`De uitsprong bedraagt ${depth} cm, terwijl op deze hoogte maximaal ${max} cm is toegelaten.`);
+  }
+  if (a.abr_projection_full_facade === 'ja' && a.abr_projection_facade_insulation !== 'ja') fail('Een volledig gevelvlak kraagt uit voorbij de rooilijn zonder dat dit uitsluitend het gevolg is van voorgevelisolatie.');
+  if (numeric(a.abr_projection_beyond_insulation_cm) > block.article27Rules.smallConstructiveElementsBeyondInsulationMaxCm) fail('Kleinschalige constructieve elementen springen te ver voorbij de voorgevelisolatie.');
+  const sideRule = block.article27Rules.sideBoundaryRule;
+  if (a.abr_projection_attached_building === 'ja' && a.abr_projection_element_type === 'constructief element' && depth > sideRule.projectionMoreThanCm && numeric(a.abr_projection_side_distance_cm) < sideRule.minimumDistanceCm) {
+    fail(`De constructieve uitsprong moet minstens ${sideRule.minimumDistanceCm} cm van de zijdelingse perceelsgrens blijven.`);
+  }
+}
+
+function evaluateHousingQuality(block, fail, add, a, visibleIds) {
+  const threshold = block.rules.thresholds;
+  if (a.abr_inside_housing_type_change === 'ja') add('not', 'Het woningtype of de woonvorm wijzigt. Deze ingreep valt niet onder de eenvoudige vrijstellingsroute voor binnenverbouwingen.');
+  const type = a.abr_inside_existing_housing_type;
+  const bedrooms = numeric(a.abr_inside_bedroom_count);
+  let livingMin = threshold.livingRoomMinM2;
+  if (a.abr_inside_kitchen_integrated === 'ja' && bedrooms !== 1) livingMin += threshold.livingRoomWithIntegratedKitchenExtraM2;
+  if (visibleIds.has('abr_inside_living_area_m2') && numeric(a.abr_inside_living_area_m2) < livingMin) fail(`De woonkamer is kleiner dan de vereiste ${livingMin} m².`);
+  if (visibleIds.has('abr_inside_separate_kitchen_area_m2') && numeric(a.abr_inside_separate_kitchen_area_m2) < threshold.separateKitchenMinM2) fail(`De afzonderlijke keuken is kleiner dan ${threshold.separateKitchenMinM2} m².`);
+  if (visibleIds.has('abr_inside_first_bedroom_area_m2') && numeric(a.abr_inside_first_bedroom_area_m2) < threshold.firstBedroomMinM2) fail(`De eerste slaapkamer is kleiner dan ${threshold.firstBedroomMinM2} m².`);
+  if (visibleIds.has('abr_inside_smallest_other_bedroom_area_m2') && numeric(a.abr_inside_smallest_other_bedroom_area_m2) < threshold.otherBedroomMinM2) fail(`Een bijkomende slaapkamer is kleiner dan ${threshold.otherBedroomMinM2} m².`);
+  if (visibleIds.has('abr_inside_storage_area_m2') && numeric(a.abr_inside_storage_area_m2) < threshold.storageMinM2) fail(`De individuele berging is kleiner dan ${threshold.storageMinM2} m².`);
+  if (visibleIds.has('abr_inside_min_clear_height_m') && numeric(a.abr_inside_min_clear_height_m) < threshold.clearHeightRenovationMinM) fail(`De vrije hoogte is kleiner dan ${threshold.clearHeightRenovationMinM} meter.`);
+  if (type === 'studio' && visibleIds.has('abr_inside_studio_area_m2') && numeric(a.abr_inside_studio_area_m2) < threshold.studioMinM2) fail(`De studio is kleiner dan ${threshold.studioMinM2} m².`);
+  if (['kamer in een kamerwoning', 'kamer in een hospitawoning'].includes(type) && visibleIds.has('abr_inside_room_area_m2')) {
+    let minimum = threshold.roomBaseMinM2;
+    if (a.abr_inside_room_private_kitchen === 'ja') minimum += threshold.roomExtraPerPrivateFacilityM2;
+    if (a.abr_inside_room_private_bathroom === 'ja') minimum += threshold.roomExtraPerPrivateFacilityM2;
+    if (numeric(a.abr_inside_room_area_m2) < minimum) fail(`De kamer is kleiner dan de vereiste ${minimum} m² voor de opgegeven private voorzieningen.`);
+  }
+  if (visibleIds.has('abr_inside_daylight_opening_area_m2')) {
+    const roomType = a.abr_inside_daylight_room_type;
+    const ratio = threshold.daylightRatio[roomType];
+    if (ratio) {
+      const relativeMin = numeric(a.abr_inside_daylight_room_area_m2) * ratio;
+      const absoluteMin = threshold.daylightAbsoluteMinimumM2[roomType] || 0;
+      const required = Math.max(relativeMin, absoluteMin);
+      if (numeric(a.abr_inside_daylight_opening_area_m2) < required) fail(`De bruikbare daglichtopening is kleiner dan de berekende minimumoppervlakte van ${required.toFixed(2)} m².`);
+    }
+  }
+}
+
+function evaluateTemporaryAndIndustry(add, a, themeId) {
+  if (themeId === 'tijdelijk' && a.temp_action === 'tijdelijke constructie/evenement') {
+    if (a.vulnerable_area_type === 'ander ruimtelijk kwetsbaar gebied') add('not', 'De tijdelijke constructie ligt in ruimtelijk kwetsbaar gebied dat geen parkgebied is.');
+  }
+  if (themeId === 'industrie_constructie' && a.nearby_vulnerable_area_type === 'ander ruimtelijk kwetsbaar gebied') {
+    const distance = numeric(a.distance_vulnerable_area);
+    const limit = a.industry_action === 'constructie zonder gebouw/verharding' ? 30 : a.industry_action === 'verharding' ? 10 : null;
+    if (limit && distance < limit) add('not', `De handeling ligt op minder dan ${limit} meter van ruimtelijk kwetsbaar gebied dat geen parkgebied is.`);
   }
 }
 
 function inferAreaMax(id) {
   if (id.includes('niet_overdekt')) return 80;
   if (id.includes('bijgebouw')) return 40;
-  if (id.includes('woning_laad_afval')) return 10;
-  if (id.includes('andere_gebouwen')) return 20;
+  if (id === 'woning_afvalhouder') return 10;
+  if (id === 'andere_afvalhouder') return 20;
   if (id.includes('openbaar_domein')) return 300;
   if (id.includes('algemeen_belang')) return 250;
   if (id.includes('divers')) return 100;
   return null;
 }
-
 function inferHeightMax(id) {
   if (id.includes('bijgebouw') || id.includes('tijdelijk')) return 3.5;
   if (id.includes('openbaar_domein')) return 5;
   return null;
 }
-
 function inferVolumeMax(id) {
   if (id.includes('woning_opslag')) return 10;
   if (id.includes('algemeen_belang')) return 30;
@@ -481,40 +492,60 @@ function inferVolumeMax(id) {
 }
 
 function buildCopyText(evaluation) {
-  return `Beste\n\nWe hebben de vraag getoetst aan het Vrijstellingsbesluit en de relevante Gentse ABR-controles.\n\nHandeling: ${state.theme.title}\nAdres/perceel: ${state.context.address || 'niet ingevuld'}\n\nConclusie: ${evaluation.status.toUpperCase()}\n\nMotivering:\n- ${evaluation.reasons.join('\n- ')}\n\nDeze beoordeling is gebaseerd op de ingevulde gegevens. Andere regelgeving, burgerrechtelijke aspecten, erfgoedtoelatingen, milieuregels en uitvoeringsvoorwaarden blijven mogelijk van toepassing.\n\nMet vriendelijke groeten`;
+  return `Beste\n\nWe hebben de vraag getoetst aan het Vrijstellingsbesluit en de opgenomen Gentse controles.\n\nHandeling: ${state.theme.title}\nAdres/perceel: ${state.context.address || 'niet ingevuld'}\nProjectcontext: ${state.route.project_context || 'niet ingevuld'}\n\nConclusie: ${evaluation.status.toUpperCase()}\n\nMotivering:\n- ${evaluation.reasons.join('\n- ')}\n\nDeze beoordeling is gebaseerd op de ingevulde gegevens. Andere regelgeving, burgerrechtelijke aspecten, erfgoedtoelatingen, milieuregels en uitvoeringsvoorwaarden kunnen nog van toepassing zijn.\n\nMet vriendelijke groeten`;
 }
 
-function renderField(question) {
-  const unit = question.unit ? ` <span class="hint">(${question.unit})</span>` : '';
+function renderField(question, values = {}) {
+  const unit = question.unit ? ` <span class="hint">(${escapeHtml(question.unit)})</span>` : '';
+  const help = question.helpText ? `<p class="hint">${escapeHtml(question.helpText)}</p>` : '';
+  const imagePlaceholder = question.helpImagePlaceholder ? `<div class="help-image-placeholder" data-image-id="${escapeHtml(question.helpImagePlaceholder.id)}" role="img" aria-label="${escapeHtml(question.helpImagePlaceholder.alt)}"><span>Illustratie wordt later toegevoegd</span></div>` : '';
+  const value = values[question.id];
 
-  if (question.type === 'text') {
-    return `<div><label for="${question.id}">${escapeHtml(question.label)}${unit}</label><input id="${question.id}" name="${question.id}" placeholder="${escapeHtml(question.placeholder || '')}"></div>`;
+  if (question.type === 'text') return `<div><label for="${question.id}">${escapeHtml(question.label)}${unit}</label><input id="${question.id}" name="${question.id}" value="${escapeHtml(value || '')}" placeholder="${escapeHtml(question.placeholder || '')}">${help}${imagePlaceholder}</div>`;
+  if (question.type === 'number') return `<div><label for="${question.id}">${escapeHtml(question.label)}${unit}</label><input id="${question.id}" name="${question.id}" value="${escapeHtml(value ?? '')}" inputmode="decimal" type="number" step="any">${help}${imagePlaceholder}</div>`;
+  if (question.type === 'multiselect') {
+    const selected = new Set(asArray(value));
+    return `<fieldset><legend>${escapeHtml(question.label)}${unit}</legend>${(question.options || []).map(option => `<label class="check-option"><input type="checkbox" name="${question.id}" value="${escapeHtml(option)}" ${selected.has(option) ? 'checked' : ''}> ${escapeHtml(option)}</label>`).join('')}${help}${imagePlaceholder}</fieldset>`;
   }
-
-  if (question.type === 'number') {
-    return `<div><label for="${question.id}">${escapeHtml(question.label)}${unit}</label><input id="${question.id}" name="${question.id}" inputmode="decimal" type="number" step="any"></div>`;
-  }
-
-  return `<div><label for="${question.id}">${escapeHtml(question.label)}${unit}</label><select id="${question.id}" name="${question.id}">${(question.options || ['onbekend', 'ja', 'nee']).map(option => `<option value="${escapeHtml(option)}">${escapeHtml(option)}</option>`).join('')}</select></div>`;
+  return `<div><label for="${question.id}">${escapeHtml(question.label)}${unit}</label><select id="${question.id}" name="${question.id}">${(question.options || ['onbekend', 'ja', 'nee']).map(option => `<option value="${escapeHtml(option)}" ${String(value ?? '') === String(option) ? 'selected' : ''}>${escapeHtml(option)}</option>`).join('')}</select>${help}${imagePlaceholder}</div>`;
 }
 
 function hydrateForm(id, data) {
   const form = document.getElementById(id);
-  Object.entries(data || {}).forEach(([key, value]) => {
-    if (form.elements[key]) form.elements[key].value = value;
-  });
+  if (!form) return;
+  for (const [key, raw] of Object.entries(data || {})) {
+    const elements = form.elements[key];
+    if (!elements) continue;
+    const values = asArray(raw);
+    if (typeof elements.length === 'number' && !elements.tagName) {
+      [...elements].forEach(element => { if (element.type === 'checkbox') element.checked = values.includes(element.value); });
+    } else if (elements.type === 'checkbox') elements.checked = values.includes(elements.value);
+    else elements.value = raw;
+  }
 }
 
 function readForm(form) {
-  return Object.fromEntries(new FormData(form).entries());
+  const data = {};
+  const formData = new FormData(form);
+  for (const [key, value] of formData.entries()) {
+    if (Object.prototype.hasOwnProperty.call(data, key)) data[key] = asArray(data[key]).concat(String(value));
+    else data[key] = String(value);
+  }
+  return data;
 }
 
-function escapeHtml(str = '') {
-  return String(str).replace(/[&<>'"]/g, char => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    "'": '&#39;',
-    '"': '&quot;'
-  }[char]));
+function asArray(value) {
+  if (Array.isArray(value)) return value.map(String);
+  if (value == null || value === '') return [];
+  return [String(value)];
+}
+function isUnknown(value) {
+  return value == null || value === '' || value === 'onbekend' || (Array.isArray(value) && value.length === 0);
+}
+function numeric(value) {
+  if (value == null || value === '') return 0;
+  return Number(String(value).replace(',', '.')) || 0;
+}
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
 }
